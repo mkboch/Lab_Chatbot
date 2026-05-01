@@ -299,9 +299,9 @@
     const SOURCE_PAGES = {
       gpu: { label: "Lab GPU Scheduler Dashboard", url: "https://mwnafee.github.io/lab-gpu-scheduler-dashboard/" },
       roles: { label: "TA/RA Roles Dashboard", url: "https://mwnafee.github.io/wanglab_phd_roles/" },
-      datasets: { label: "Lab Datasets Page", url: "https://wang-axis.github.io/datasets/" },
+      datasets: { label: "WANG-AXIS Lab Datasets Page", url: "https://wang-axis.github.io/datasets/" },
       github: { label: "WANG-AXIS GitHub Organization", url: "https://github.com/WANG-AXIS" },
-      inventory: { label: "Lab Inventory Source Page", url: "https://wang-axis.github.io/datasets/" },
+      inventory: { label: "Internal lab inventory database", url: "" },
       overview: { label: "WANG-AXIS Lab Website", url: "https://wang-axis.github.io/" }
     };
 
@@ -309,15 +309,28 @@
     const input = document.getElementById("q");
     const askBtn = document.getElementById("askBtn");
 
+    function hasWord(text, words) {
+      return words.some((w) => new RegExp("\\b" + w + "\\b", "i").test(text));
+    }
+
     function inferSource(question, data) {
       const q = question.toLowerCase();
       const topic = String(data.topic || "").toLowerCase();
 
-      if (q.includes("gpu") || topic.includes("gpu")) return SOURCE_PAGES.gpu;
-      if (q.includes("ta") || q.includes("ra") || q.includes("student") || q.includes("role") || topic.includes("role")) return SOURCE_PAGES.roles;
-      if (q.includes("dataset") || topic.includes("dataset")) return SOURCE_PAGES.datasets;
-      if (q.includes("github") || q.includes("repo") || topic.includes("github") || topic.includes("repo")) return SOURCE_PAGES.github;
-      if (q.includes("room") || q.includes("inventory") || topic.includes("inventory")) return SOURCE_PAGES.inventory;
+      // Prefer the user's actual question first.
+      if (hasWord(q, ["gpu", "gpus", "cuda", "h100", "a5000"])) return SOURCE_PAGES.gpu;
+      if (hasWord(q, ["dataset", "datasets", "data"])) return SOURCE_PAGES.datasets;
+      if (hasWord(q, ["github", "repo", "repos", "repository", "repositories"])) return SOURCE_PAGES.github;
+      if (hasWord(q, ["inventory", "room", "rooms", "equipment", "item", "items"])) return SOURCE_PAGES.inventory;
+      if (hasWord(q, ["ta", "ra", "student", "students", "role", "roles", "assistantship", "assistantships"])) return SOURCE_PAGES.roles;
+
+      // Then use backend topic only as fallback.
+      if (topic.includes("gpu")) return SOURCE_PAGES.gpu;
+      if (topic.includes("dataset")) return SOURCE_PAGES.datasets;
+      if (topic.includes("github") || topic.includes("repo")) return SOURCE_PAGES.github;
+      if (topic.includes("inventory") || topic.includes("room")) return SOURCE_PAGES.inventory;
+      if (topic.includes("role") || topic.includes("ta") || topic.includes("ra")) return SOURCE_PAGES.roles;
+
       return SOURCE_PAGES.overview;
     }
 
@@ -329,10 +342,14 @@
       bubble.className = "bubble";
       bubble.textContent = text;
 
-      if (source && source.url && role === "assistant") {
+      if (source && role === "assistant") {
         const sourceDiv = document.createElement("div");
         sourceDiv.className = "source-link";
-        sourceDiv.innerHTML = 'Reference page: <a href="' + source.url + '" target="_blank" rel="noopener noreferrer">' + source.label + '</a>';
+        if (source.url) {
+          sourceDiv.innerHTML = 'Reference page: <a href="' + source.url + '" target="_blank" rel="noopener noreferrer">' + source.label + '</a>';
+        } else {
+          sourceDiv.textContent = "Reference source: " + source.label;
+        }
         bubble.appendChild(sourceDiv);
       }
 
