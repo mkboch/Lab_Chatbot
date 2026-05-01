@@ -3,101 +3,134 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WANG-AXIS Lab Chatbot</title>
+  <title>WANG-AXIS AI Lab Manager</title>
   <style>
-    * {
-      box-sizing: border-box;
+    * { box-sizing: border-box; }
+    :root {
+      --bg: #f8fbff;
+      --panel: rgba(255,255,255,0.78);
+      --panel-solid: #ffffff;
+      --border: rgba(226,232,240,0.92);
+      --text: #0f172a;
+      --muted: #64748b;
+      --blue: #2563eb;
+      --blue2: #1d4ed8;
+      --soft: rgba(37,99,235,0.08);
+      --shadow: 0 16px 45px rgba(15,23,42,0.08);
     }
 
     html, body {
       margin: 0;
-      min-height: 100%;
+      width: 100%;
+      height: 100%;
       font-family: Inter, Arial, Helvetica, sans-serif;
-      color: #0f172a;
-    }
-
-    body {
+      color: var(--text);
       background:
-        radial-gradient(circle at 10% 20%, rgba(96, 165, 250, 0.35), transparent 32%),
-        radial-gradient(circle at 85% 15%, rgba(168, 85, 247, 0.26), transparent 30%),
-        radial-gradient(circle at 55% 85%, rgba(45, 212, 191, 0.24), transparent 34%),
-        linear-gradient(135deg, #f8fbff 0%, #eef4ff 48%, #f9f7ff 100%);
+        radial-gradient(circle at 12% 18%, rgba(96,165,250,0.32), transparent 32%),
+        radial-gradient(circle at 82% 8%, rgba(168,85,247,0.24), transparent 30%),
+        radial-gradient(circle at 58% 88%, rgba(45,212,191,0.22), transparent 34%),
+        linear-gradient(135deg, #f8fbff 0%, #eef4ff 48%, #fbf7ff 100%);
       overflow: hidden;
     }
 
     .app {
-      width: 100vw;
       height: 100vh;
+      width: 100vw;
       display: grid;
-      grid-template-rows: auto auto 1fr auto;
-      background: rgba(255, 255, 255, 0.58);
+      grid-template-columns: 280px 1fr 330px;
+      grid-template-rows: auto 1fr auto;
       backdrop-filter: blur(18px);
     }
 
-    .topbar {
-      padding: 24px 34px 18px;
-      border-bottom: 1px solid rgba(226, 232, 240, 0.9);
-      background: rgba(255, 255, 255, 0.72);
+    .header {
+      grid-column: 1 / 4;
+      padding: 22px 30px 16px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,0.72);
     }
 
-    .title {
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-start;
+    }
+
+    h1 {
       margin: 0;
-      font-size: 2.05rem;
-      font-weight: 850;
+      font-size: 2rem;
       letter-spacing: -0.035em;
-      color: #0f172a;
+      font-weight: 850;
     }
 
     .subtitle {
-      max-width: 980px;
       margin-top: 8px;
+      max-width: 980px;
+      color: var(--muted);
+      line-height: 1.5;
       font-size: 0.98rem;
-      line-height: 1.55;
-      color: #5f6b7a;
     }
 
-    .shortcuts {
-      padding: 16px 34px;
-      border-bottom: 1px solid rgba(226, 232, 240, 0.85);
-      background: rgba(248, 251, 255, 0.65);
-    }
-
-    .shortcut-label {
-      margin-bottom: 10px;
-      font-size: 0.88rem;
-      font-weight: 750;
-      color: #64748b;
-    }
-
-    .chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .chip {
-      border: 1px solid rgba(203, 213, 225, 0.92);
-      background: rgba(255, 255, 255, 0.82);
-      color: #334155;
-      padding: 9px 14px;
+    .status-pill {
+      white-space: nowrap;
+      border: 1px solid #bfdbfe;
+      background: #eff6ff;
+      color: #1e40af;
       border-radius: 999px;
-      font-size: 0.92rem;
+      padding: 8px 12px;
+      font-size: 0.84rem;
+      font-weight: 750;
+    }
+
+    .sidebar {
+      grid-row: 2 / 4;
+      border-right: 1px solid var(--border);
+      background: rgba(248,251,255,0.70);
+      padding: 18px;
+      overflow-y: auto;
+    }
+
+    .side-title {
+      font-size: 0.84rem;
+      font-weight: 800;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin: 8px 0 12px;
+    }
+
+    .group {
+      margin-bottom: 20px;
+    }
+
+    .quick {
+      width: 100%;
+      text-align: left;
+      margin: 7px 0;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.82);
+      color: #334155;
+      padding: 10px 12px;
+      border-radius: 14px;
+      font-size: 0.9rem;
+      line-height: 1.35;
       font-weight: 650;
       cursor: pointer;
-      transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease;
-      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+      transition: 0.16s ease;
+      box-shadow: 0 4px 14px rgba(15,23,42,0.035);
     }
 
-    .chip:hover {
+    .quick:hover {
       transform: translateY(-1px);
       border-color: #93c5fd;
       background: #ffffff;
     }
 
     .chat {
+      grid-column: 2;
+      grid-row: 2;
       overflow-y: auto;
-      padding: 28px 34px 22px;
-      scroll-behavior: smooth;
+      padding: 26px 30px;
     }
 
     .msg-row {
@@ -114,7 +147,7 @@
     }
 
     .bubble {
-      max-width: min(760px, 78vw);
+      max-width: min(850px, 78%);
       padding: 15px 17px;
       border-radius: 20px;
       line-height: 1.55;
@@ -123,46 +156,57 @@
       font-size: 0.98rem;
     }
 
-    .msg-row.user .bubble {
-      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    .user .bubble {
       color: white;
+      background: linear-gradient(135deg, var(--blue), var(--blue2));
       border-bottom-right-radius: 7px;
-      box-shadow: 0 12px 28px rgba(37, 99, 235, 0.22);
+      box-shadow: 0 12px 28px rgba(37,99,235,0.22);
     }
 
-    .msg-row.assistant .bubble {
-      background: rgba(255, 255, 255, 0.88);
-      color: #1f2937;
-      border: 1px solid rgba(226, 232, 240, 0.95);
+    .assistant .bubble {
+      background: rgba(255,255,255,0.90);
+      border: 1px solid var(--border);
       border-bottom-left-radius: 7px;
-      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+      box-shadow: var(--shadow);
     }
 
-    .source-link {
+    .answer-meta {
       margin-top: 12px;
       padding-top: 10px;
       border-top: 1px solid #e5e7eb;
-      font-size: 0.84rem;
-      color: #64748b;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
       white-space: normal;
     }
 
-    .source-link a {
-      color: #2563eb;
+    .meta-chip {
+      border-radius: 999px;
+      background: #f1f5f9;
+      color: #475569;
+      padding: 5px 9px;
+      font-size: 0.78rem;
       font-weight: 700;
-      text-decoration: none;
     }
 
-    .source-link a:hover {
-      text-decoration: underline;
+    .source-a {
+      color: var(--blue);
+      text-decoration: none;
+      font-weight: 800;
+      font-size: 0.82rem;
     }
+
+    .source-a:hover { text-decoration: underline; }
 
     .composer {
+      grid-column: 2;
+      grid-row: 3;
+      padding: 16px 30px 22px;
+      border-top: 1px solid var(--border);
+      background: rgba(255,255,255,0.76);
       display: flex;
       gap: 12px;
-      padding: 18px 34px 24px;
-      border-top: 1px solid rgba(226, 232, 240, 0.9);
-      background: rgba(255, 255, 255, 0.78);
     }
 
     .input {
@@ -170,33 +214,79 @@
       border: 1px solid #cbd5e1;
       border-radius: 16px;
       padding: 15px 16px;
-      font-size: 0.98rem;
       outline: none;
-      background: rgba(255, 255, 255, 0.94);
-      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      font-size: 0.98rem;
+      background: rgba(255,255,255,0.95);
     }
 
     .input:focus {
       border-color: #60a5fa;
-      box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.18);
+      box-shadow: 0 0 0 4px rgba(96,165,250,0.16);
     }
 
     .btn {
       border: none;
       border-radius: 16px;
-      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      background: linear-gradient(135deg, var(--blue), var(--blue2));
       color: white;
       font-size: 0.98rem;
-      font-weight: 800;
+      font-weight: 850;
       padding: 15px 22px;
+      min-width: 92px;
       cursor: pointer;
-      min-width: 94px;
-      box-shadow: 0 12px 25px rgba(37, 99, 235, 0.22);
+      box-shadow: 0 12px 25px rgba(37,99,235,0.22);
+    }
+
+    .btn.secondary {
+      background: #f8fafc;
+      color: #334155;
+      border: 1px solid #cbd5e1;
+      box-shadow: none;
+      min-width: auto;
     }
 
     .btn:disabled {
-      opacity: 0.62;
+      opacity: 0.6;
       cursor: not-allowed;
+    }
+
+    .right {
+      grid-column: 3;
+      grid-row: 2 / 4;
+      border-left: 1px solid var(--border);
+      background: rgba(248,251,255,0.70);
+      padding: 18px;
+      overflow-y: auto;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.84);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 15px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 24px rgba(15,23,42,0.045);
+    }
+
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.45;
+    }
+
+    .source-card a {
+      color: var(--blue);
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .source-card a:hover {
+      text-decoration: underline;
     }
 
     .typing {
@@ -215,46 +305,39 @@
       animation: bounce 1.2s infinite ease-in-out;
     }
 
-    .typing span:nth-child(2) {
-      animation-delay: 0.15s;
-    }
-
-    .typing span:nth-child(3) {
-      animation-delay: 0.3s;
-    }
+    .typing span:nth-child(2) { animation-delay: 0.15s; }
+    .typing span:nth-child(3) { animation-delay: 0.3s; }
 
     @keyframes bounce {
       0%, 80%, 100% { transform: translateY(0); opacity: 0.45; }
       40% { transform: translateY(-5px); opacity: 1; }
     }
 
-    @media (max-width: 720px) {
-      body {
-        overflow: auto;
-      }
-
+    @media (max-width: 1050px) {
+      body { overflow: auto; }
       .app {
-        min-height: 100vh;
         height: auto;
+        min-height: 100vh;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto auto;
       }
-
-      .topbar, .shortcuts, .chat, .composer {
-        padding-left: 18px;
-        padding-right: 18px;
+      .header, .sidebar, .chat, .composer, .right {
+        grid-column: 1;
+        grid-row: auto;
       }
-
-      .title {
-        font-size: 1.65rem;
+      .sidebar, .right {
+        border: none;
+        border-bottom: 1px solid var(--border);
       }
-
+      .chat {
+        min-height: 55vh;
+      }
       .bubble {
-        max-width: 90vw;
+        max-width: 92%;
       }
-
       .composer {
         flex-direction: column;
       }
-
       .btn {
         width: 100%;
       }
@@ -263,94 +346,152 @@
 </head>
 <body>
   <main class="app">
-    <header class="topbar">
-      <h1 class="title">WANG-AXIS Lab Chatbot</h1>
-      <div class="subtitle">
-        Ask about lab resources, GPU availability, datasets, inventory rooms, GitHub repositories, and TA/RA role information.
+    <header class="header">
+      <div class="header-top">
+        <div>
+          <h1>WANG-AXIS AI Lab Manager</h1>
+          <div class="subtitle">
+            Ask operational and analytical questions about lab resources, GPUs, datasets, inventory rooms,
+            GitHub repositories, and TA/RA role information. Factual answers are grounded in live lab data.
+          </div>
+        </div>
+        <div id="statusPill" class="status-pill">Checking backend...</div>
       </div>
     </header>
 
-    <section class="shortcuts">
-      <div class="shortcut-label">Example questions</div>
-      <div class="chips">
-        <button class="chip" onclick="quickAsk('Give me a brief overview of the lab resources.')">Lab overview</button>
-        <button class="chip" onclick="quickAsk('Which GPUs are available right now?')">Available GPUs</button>
-        <button class="chip" onclick="quickAsk('Which GPUs are being used now?')">Active GPUs</button>
-        <button class="chip" onclick="quickAsk('Summarize the current student TA and RA roles.')">Student roles</button>
-        <button class="chip" onclick="quickAsk('Who served as TA and in which terms?')">TA assignments</button>
-        <button class="chip" onclick="quickAsk('List all lab datasets with names and sizes.')">Datasets</button>
-        <button class="chip" onclick="quickAsk('How many rooms are associated with the lab inventory?')">Inventory rooms</button>
-        <button class="chip" onclick="quickAsk('Summarize the lab GitHub repositories.')">GitHub repositories</button>
+    <aside class="sidebar">
+      <div class="group">
+        <div class="side-title">Resources</div>
+        <button class="quick" onclick="quickAsk('Give me a brief overview of the lab resources.')">Lab resource overview</button>
+        <button class="quick" onclick="quickAsk('Tell me about lab inventory and rooms.')">Inventory and rooms</button>
+        <button class="quick" onclick="quickAsk('Summarize the lab GitHub repositories.')">GitHub repositories</button>
       </div>
-    </section>
+
+      <div class="group">
+        <div class="side-title">GPU Manager</div>
+        <button class="quick" onclick="quickAsk('Which GPUs are available right now?')">Available GPUs</button>
+        <button class="quick" onclick="quickAsk('Which GPUs are being used now?')">Active GPUs</button>
+        <button class="quick" onclick="quickAsk('Which GPU should I use for a large language model experiment and why?')">GPU recommendation</button>
+      </div>
+
+      <div class="group">
+        <div class="side-title">Datasets</div>
+        <button class="quick" onclick="quickAsk('List all lab datasets with names and sizes.')">Dataset list</button>
+        <button class="quick" onclick="quickAsk('In the datasets, is there any medical imaging related dataset?')">Medical imaging datasets</button>
+        <button class="quick" onclick="quickAsk('Which datasets are most suitable for chest CT vision-language modeling?')">Dataset suitability</button>
+      </div>
+
+      <div class="group">
+        <div class="side-title">People and Roles</div>
+        <button class="quick" onclick="quickAsk('Summarize the current student TA and RA roles.')">TA/RA summary</button>
+        <button class="quick" onclick="quickAsk('Who served as TA and in which terms?')">TA assignments</button>
+        <button class="quick" onclick="quickAsk('Who has mostly been RA versus TA?')">Role analysis</button>
+      </div>
+    </aside>
 
     <section id="chat" class="chat"></section>
 
     <section class="composer">
-      <input id="q" class="input" type="text" placeholder="Ask about WANG-AXIS lab resources..." />
+      <input id="q" class="input" type="text" placeholder="Ask the AI Lab Manager a question..." />
       <button id="askBtn" class="btn">Ask</button>
+      <button id="copyBtn" class="btn secondary" onclick="copyLastAnswer()">Copy</button>
     </section>
+
+    <aside class="right">
+      <div class="card">
+        <h3>Answer behavior</h3>
+        <div class="small">
+          Counts, lists, roles, GPU status, and inventory lookups use exact database-grounded answers.
+          Recommendation or comparison questions use retrieved facts with LLM synthesis.
+        </div>
+      </div>
+
+      <div class="card source-card">
+        <h3>Last reference</h3>
+        <div id="lastSource" class="small">No answer yet.</div>
+      </div>
+
+      <div class="card">
+        <h3>Useful references</h3>
+        <div class="small">
+          <p><a href="https://wang-axis.github.io/" target="_blank" rel="noopener noreferrer">WANG-AXIS Lab Website</a></p>
+          <p><a href="https://wang-axis.github.io/datasets/" target="_blank" rel="noopener noreferrer">Lab Datasets Page</a></p>
+          <p><a href="https://mwnafee.github.io/lab-gpu-scheduler-dashboard/" target="_blank" rel="noopener noreferrer">GPU Scheduler Dashboard</a></p>
+          <p><a href="https://mwnafee.github.io/wanglab_phd_roles/" target="_blank" rel="noopener noreferrer">TA/RA Roles Dashboard</a></p>
+          <p><a href="https://github.com/WANG-AXIS" target="_blank" rel="noopener noreferrer">WANG-AXIS GitHub</a></p>
+        </div>
+      </div>
+    </aside>
   </main>
 
   <script>
-    const API_BASE = "https://infections-deborah-patterns-maiden.trycloudflare.com";
+    const API_BASE = "https://contractor-moving-prospective-alan.trycloudflare.com";
     const DEMO_TOKEN = "wangaxis-demo";
-
-    const SOURCE_PAGES = {
-      gpu: { label: "Lab GPU Scheduler Dashboard", url: "https://mwnafee.github.io/lab-gpu-scheduler-dashboard/" },
-      roles: { label: "TA/RA Roles Dashboard", url: "https://mwnafee.github.io/wanglab_phd_roles/" },
-      datasets: { label: "WANG-AXIS Lab Datasets Page", url: "https://wang-axis.github.io/datasets/" },
-      github: { label: "WANG-AXIS GitHub Organization", url: "https://github.com/WANG-AXIS" },
-      inventory: { label: "Internal lab inventory database", url: "" },
-      overview: { label: "WANG-AXIS Lab Website", url: "https://wang-axis.github.io/" }
-    };
 
     const chat = document.getElementById("chat");
     const input = document.getElementById("q");
     const askBtn = document.getElementById("askBtn");
+    const statusPill = document.getElementById("statusPill");
+    const lastSource = document.getElementById("lastSource");
 
-    function hasWord(text, words) {
-      return words.some((w) => new RegExp("\\b" + w + "\\b", "i").test(text));
+    let lastAnswer = "";
+
+    function escapeHtml(text) {
+      return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
     }
 
-    function inferSource(question, data) {
-      const q = question.toLowerCase();
-      const topic = String(data.topic || "").toLowerCase();
-
-      // Prefer the user's actual question first.
-      if (hasWord(q, ["gpu", "gpus", "cuda", "h100", "a5000"])) return SOURCE_PAGES.gpu;
-      if (hasWord(q, ["dataset", "datasets", "data"])) return SOURCE_PAGES.datasets;
-      if (hasWord(q, ["github", "repo", "repos", "repository", "repositories"])) return SOURCE_PAGES.github;
-      if (hasWord(q, ["inventory", "room", "rooms", "equipment", "item", "items"])) return SOURCE_PAGES.inventory;
-      if (hasWord(q, ["ta", "ra", "student", "students", "role", "roles", "assistantship", "assistantships"])) return SOURCE_PAGES.roles;
-
-      // Then use backend topic only as fallback.
-      if (topic.includes("gpu")) return SOURCE_PAGES.gpu;
-      if (topic.includes("dataset")) return SOURCE_PAGES.datasets;
-      if (topic.includes("github") || topic.includes("repo")) return SOURCE_PAGES.github;
-      if (topic.includes("inventory") || topic.includes("room")) return SOURCE_PAGES.inventory;
-      if (topic.includes("role") || topic.includes("ta") || topic.includes("ra")) return SOURCE_PAGES.roles;
-
-      return SOURCE_PAGES.overview;
-    }
-
-    function addMessage(role, text, source=null) {
+    function addMessage(role, text, meta = null) {
       const row = document.createElement("div");
       row.className = "msg-row " + role;
 
       const bubble = document.createElement("div");
       bubble.className = "bubble";
-      bubble.textContent = text;
+      bubble.innerHTML = escapeHtml(text);
 
-      if (source && role === "assistant") {
-        const sourceDiv = document.createElement("div");
-        sourceDiv.className = "source-link";
-        if (source.url) {
-          sourceDiv.innerHTML = 'Reference page: <a href="' + source.url + '" target="_blank" rel="noopener noreferrer">' + source.label + '</a>';
-        } else {
-          sourceDiv.textContent = "Reference source: " + source.label;
+      if (meta && role === "assistant") {
+        const metaDiv = document.createElement("div");
+        metaDiv.className = "answer-meta";
+
+        if (meta.mode) {
+          const m = document.createElement("span");
+          m.className = "meta-chip";
+          m.textContent = meta.mode;
+          metaDiv.appendChild(m);
         }
-        bubble.appendChild(sourceDiv);
+
+        if (meta.topic) {
+          const t = document.createElement("span");
+          t.className = "meta-chip";
+          t.textContent = "Topic: " + meta.topic;
+          metaDiv.appendChild(t);
+        }
+
+        if (meta.source_page) {
+          const source = meta.source_page;
+          if (source.url) {
+            const a = document.createElement("a");
+            a.className = "source-a";
+            a.href = source.url;
+            a.target = "_blank";
+            a.rel = "noopener noreferrer";
+            a.textContent = "Reference page: " + source.label;
+            metaDiv.appendChild(a);
+
+            lastSource.innerHTML = '<a href="' + source.url + '" target="_blank" rel="noopener noreferrer">' + source.label + '</a>';
+          } else {
+            const s = document.createElement("span");
+            s.className = "meta-chip";
+            s.textContent = "Reference source: " + source.label;
+            metaDiv.appendChild(s);
+
+            lastSource.textContent = source.label;
+          }
+        }
+
+        bubble.appendChild(metaDiv);
       }
 
       row.appendChild(bubble);
@@ -366,16 +507,11 @@
 
       const bubble = document.createElement("div");
       bubble.className = "bubble";
+      bubble.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
 
-      const typing = document.createElement("div");
-      typing.className = "typing";
-      typing.innerHTML = "<span></span><span></span><span></span>";
-
-      bubble.appendChild(typing);
       row.appendChild(bubble);
       chat.appendChild(row);
       chat.scrollTop = chat.scrollHeight;
-      return row;
     }
 
     function removeTyping() {
@@ -383,7 +519,27 @@
       if (t) t.remove();
     }
 
-    async function sendQuestion(qText=null) {
+    async function checkBackend() {
+      try {
+        const res = await fetch(API_BASE + "/health");
+        const data = await res.json();
+        if (data.ok) {
+          statusPill.textContent = "Backend online";
+          statusPill.style.background = "#ecfdf5";
+          statusPill.style.borderColor = "#bbf7d0";
+          statusPill.style.color = "#166534";
+        } else {
+          throw new Error("not ok");
+        }
+      } catch (e) {
+        statusPill.textContent = "Backend offline";
+        statusPill.style.background = "#fef2f2";
+        statusPill.style.borderColor = "#fecaca";
+        statusPill.style.color = "#991b1b";
+      }
+    }
+
+    async function sendQuestion(qText = null) {
       const q = (qText !== null ? qText : input.value).trim();
       if (!q) return;
 
@@ -391,7 +547,6 @@
       input.value = "";
       input.focus();
       askBtn.disabled = true;
-
       addTyping();
 
       try {
@@ -401,16 +556,20 @@
 
         removeTyping();
 
-        if (data.error) {
-          addMessage("assistant", "Error: " + data.error);
+        if (!res.ok || data.error) {
+          addMessage("assistant", "Error: " + (data.error || "Request failed."));
           return;
         }
 
-        const source = data.source_page || inferSource(q, data);
-        addMessage("assistant", data.answer || "No answer returned.", source);
-      } catch (err) {
+        lastAnswer = data.answer || "";
+        addMessage("assistant", lastAnswer || "No answer returned.", {
+          mode: data.mode,
+          topic: data.topic,
+          source_page: data.source_page
+        });
+      } catch (e) {
         removeTyping();
-        addMessage("assistant", "The chatbot could not be reached right now. Please try again in a moment.");
+        addMessage("assistant", "The AI Lab Manager could not be reached right now. The model server or public tunnel may be offline.");
       } finally {
         askBtn.disabled = false;
       }
@@ -421,6 +580,14 @@
       sendQuestion(text);
     }
 
+    async function copyLastAnswer() {
+      if (!lastAnswer) return;
+      await navigator.clipboard.writeText(lastAnswer);
+      const old = document.getElementById("copyBtn").textContent;
+      document.getElementById("copyBtn").textContent = "Copied";
+      setTimeout(() => document.getElementById("copyBtn").textContent = old, 1000);
+    }
+
     askBtn.addEventListener("click", () => sendQuestion());
     input.addEventListener("keydown", (e) => {
       if (e.key === "Enter") sendQuestion();
@@ -428,9 +595,10 @@
 
     addMessage(
       "assistant",
-      "Hello. I am the WANG-AXIS Lab Chatbot. You can ask me about lab resources, GPUs, datasets, inventory rooms, GitHub repositories, and TA/RA roles.",
-      SOURCE_PAGES.overview
+      "Hello. I am the WANG-AXIS AI Lab Manager. I can answer factual questions from lab data and help reason across datasets, GPUs, inventory, repositories, and TA/RA roles."
     );
+
+    checkBackend();
   </script>
 </body>
 </html>
