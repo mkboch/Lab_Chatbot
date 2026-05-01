@@ -7,16 +7,13 @@
   <style>
     * { box-sizing: border-box; }
     :root {
-      --bg: #f8fbff;
-      --panel: rgba(255,255,255,0.78);
-      --panel-solid: #ffffff;
-      --border: rgba(226,232,240,0.92);
       --text: #0f172a;
       --muted: #64748b;
+      --border: rgba(226,232,240,0.9);
       --blue: #2563eb;
-      --blue2: #1d4ed8;
-      --soft: rgba(37,99,235,0.08);
-      --shadow: 0 16px 45px rgba(15,23,42,0.08);
+      --blue-dark: #1d4ed8;
+      --panel: rgba(255,255,255,0.84);
+      --shadow: 0 14px 38px rgba(15,23,42,0.08);
     }
 
     html, body {
@@ -26,291 +23,273 @@
       font-family: Inter, Arial, Helvetica, sans-serif;
       color: var(--text);
       background:
-        radial-gradient(circle at 12% 18%, rgba(96,165,250,0.32), transparent 32%),
-        radial-gradient(circle at 82% 8%, rgba(168,85,247,0.24), transparent 30%),
-        radial-gradient(circle at 58% 88%, rgba(45,212,191,0.22), transparent 34%),
+        radial-gradient(circle at 12% 16%, rgba(96,165,250,0.30), transparent 30%),
+        radial-gradient(circle at 82% 10%, rgba(168,85,247,0.22), transparent 30%),
+        radial-gradient(circle at 62% 88%, rgba(45,212,191,0.20), transparent 34%),
         linear-gradient(135deg, #f8fbff 0%, #eef4ff 48%, #fbf7ff 100%);
       overflow: hidden;
+      font-size: 14px;
     }
 
     .app {
       height: 100vh;
       width: 100vw;
       display: grid;
-      grid-template-columns: 280px 1fr 330px;
+      grid-template-columns: 260px 1fr 310px;
       grid-template-rows: auto 1fr auto;
-      backdrop-filter: blur(18px);
     }
 
-    .header {
+    header {
       grid-column: 1 / 4;
-      padding: 22px 30px 16px;
+      padding: 16px 24px 12px;
       border-bottom: 1px solid var(--border);
       background: rgba(255,255,255,0.72);
-    }
-
-    .header-top {
+      backdrop-filter: blur(14px);
       display: flex;
       justify-content: space-between;
-      gap: 18px;
+      gap: 16px;
       align-items: flex-start;
     }
 
     h1 {
       margin: 0;
       font-size: 1.55rem;
-      letter-spacing: -0.035em;
-      font-weight: 850;
+      letter-spacing: -0.03em;
     }
 
     .subtitle {
-      margin-top: 8px;
-      max-width: 980px;
+      margin-top: 6px;
       color: var(--muted);
-      line-height: 1.5;
-      font-size: 0.74rem;
+      line-height: 1.45;
+      max-width: 900px;
+      font-size: 0.86rem;
     }
 
-    .status-pill {
+    .status {
       white-space: nowrap;
+      border-radius: 999px;
+      padding: 7px 10px;
       border: 1px solid #bfdbfe;
       background: #eff6ff;
       color: #1e40af;
-      border-radius: 999px;
-      padding: 8px 12px;
+      font-weight: 700;
       font-size: 0.76rem;
-      font-weight: 750;
     }
 
-    .sidebar {
+    aside.left {
       grid-row: 2 / 4;
       border-right: 1px solid var(--border);
-      background: rgba(248,251,255,0.70);
-      padding: 18px;
+      background: rgba(248,251,255,0.72);
+      padding: 14px;
       overflow-y: auto;
     }
 
-    .side-title {
-      font-size: 0.76rem;
-      font-weight: 800;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin: 8px 0 12px;
+    aside.right {
+      grid-column: 3;
+      grid-row: 2 / 4;
+      border-left: 1px solid var(--border);
+      background: rgba(248,251,255,0.72);
+      padding: 14px;
+      overflow-y: auto;
     }
 
-    .group {
-      margin-bottom: 20px;
+    .section-title {
+      margin: 8px 0 8px;
+      color: var(--muted);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 800;
     }
 
     .quick {
       width: 100%;
       text-align: left;
-      margin: 7px 0;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,0.82);
-      color: #334155;
+      margin: 5px 0;
       padding: 8px 10px;
-      border-radius: 14px;
-      font-size: 0.80rem;
-      line-height: 1.35;
-      font-weight: 650;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.86);
+      color: #334155;
       cursor: pointer;
-      transition: 0.16s ease;
-      box-shadow: 0 4px 14px rgba(15,23,42,0.035);
+      font-weight: 650;
+      font-size: 0.78rem;
+      line-height: 1.35;
     }
 
     .quick:hover {
-      transform: translateY(-1px);
       border-color: #93c5fd;
-      background: #ffffff;
+      background: white;
     }
 
     .chat {
       grid-column: 2;
       grid-row: 2;
+      padding: 20px 24px;
       overflow-y: auto;
-      padding: 26px 30px;
     }
 
-    .msg-row {
+    .row {
       display: flex;
-      margin-bottom: 18px;
+      margin-bottom: 14px;
     }
 
-    .msg-row.user {
+    .row.user {
       justify-content: flex-end;
     }
 
-    .msg-row.assistant {
+    .row.assistant {
       justify-content: flex-start;
     }
 
     .bubble {
-      max-width: min(800px, 76%);
-      padding: 12px 14px;
-      border-radius: 20px;
-      line-height: 1.55;
+      max-width: min(820px, 78%);
+      padding: 11px 13px;
+      border-radius: 17px;
+      line-height: 1.48;
       white-space: pre-wrap;
       word-wrap: break-word;
-      font-size: 0.74rem;
+      font-size: 0.84rem;
     }
 
     .user .bubble {
       color: white;
-      background: linear-gradient(135deg, var(--blue), var(--blue2));
-      border-bottom-right-radius: 7px;
-      box-shadow: 0 12px 28px rgba(37,99,235,0.22);
+      background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+      border-bottom-right-radius: 6px;
+      box-shadow: 0 12px 25px rgba(37,99,235,0.22);
     }
 
     .assistant .bubble {
-      background: rgba(255,255,255,0.90);
+      background: rgba(255,255,255,0.92);
       border: 1px solid var(--border);
-      border-bottom-left-radius: 7px;
+      border-bottom-left-radius: 6px;
       box-shadow: var(--shadow);
     }
 
-    .answer-meta {
-      margin-top: 12px;
-      padding-top: 10px;
+    .meta {
+      margin-top: 10px;
+      padding-top: 8px;
       border-top: 1px solid #e5e7eb;
       display: flex;
+      gap: 7px;
       flex-wrap: wrap;
-      gap: 8px;
       align-items: center;
       white-space: normal;
     }
 
-    .meta-chip {
+    .chip {
       border-radius: 999px;
       background: #f1f5f9;
       color: #475569;
-      padding: 5px 9px;
-      font-size: 0.74rem;
+      padding: 4px 8px;
+      font-size: 0.70rem;
       font-weight: 700;
     }
 
-    .source-a {
+    .source-link {
       color: var(--blue);
       text-decoration: none;
       font-weight: 800;
-      font-size: 0.76rem;
+      font-size: 0.72rem;
     }
 
-    .source-a:hover { text-decoration: underline; }
+    .source-link:hover {
+      text-decoration: underline;
+    }
 
     .composer {
       grid-column: 2;
       grid-row: 3;
-      padding: 16px 30px 22px;
+      padding: 13px 24px 18px;
       border-top: 1px solid var(--border);
       background: rgba(255,255,255,0.76);
       display: flex;
-      gap: 12px;
+      gap: 10px;
     }
 
-    .input {
+    input {
       flex: 1;
       border: 1px solid #cbd5e1;
-      border-radius: 16px;
-      padding: 12px 14px;
+      border-radius: 14px;
+      padding: 11px 13px;
+      font-size: 0.84rem;
       outline: none;
-      font-size: 0.74rem;
-      background: rgba(255,255,255,0.95);
+      background: rgba(255,255,255,0.96);
     }
 
-    .input:focus {
+    input:focus {
       border-color: #60a5fa;
       box-shadow: 0 0 0 4px rgba(96,165,250,0.16);
     }
 
-    .btn {
-      border: none;
-      border-radius: 16px;
-      background: linear-gradient(135deg, var(--blue), var(--blue2));
-      color: white;
-      font-size: 0.74rem;
-      font-weight: 850;
-      padding: 12px 18px;
-      min-width: 92px;
+    button.ask, button.copy {
+      border-radius: 14px;
+      padding: 11px 16px;
+      font-weight: 800;
+      font-size: 0.84rem;
       cursor: pointer;
-      box-shadow: 0 12px 25px rgba(37,99,235,0.22);
     }
 
-    .btn.secondary {
+    button.ask {
+      border: none;
+      color: white;
+      background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+      box-shadow: 0 10px 22px rgba(37,99,235,0.22);
+    }
+
+    button.copy {
+      border: 1px solid #cbd5e1;
       background: #f8fafc;
       color: #334155;
-      border: 1px solid #cbd5e1;
-      box-shadow: none;
-      min-width: auto;
     }
 
-    .btn:disabled {
+    button:disabled {
       opacity: 0.6;
       cursor: not-allowed;
     }
 
-    .right {
-      grid-column: 3;
-      grid-row: 2 / 4;
-      border-left: 1px solid var(--border);
-      background: rgba(248,251,255,0.70);
-      padding: 18px;
-      overflow-y: auto;
-    }
-
     .card {
-      background: rgba(255,255,255,0.84);
+      background: var(--panel);
       border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 15px;
-      margin-bottom: 14px;
-      box-shadow: 0 8px 24px rgba(15,23,42,0.045);
+      border-radius: 16px;
+      padding: 13px;
+      margin-bottom: 12px;
+      box-shadow: 0 8px 20px rgba(15,23,42,0.045);
     }
 
     .card h3 {
-      margin: 0 0 8px;
+      margin: 0 0 7px;
       font-size: 0.88rem;
     }
 
     .small {
       color: var(--muted);
-      font-size: 0.74rem;
+      font-size: 0.76rem;
       line-height: 1.45;
     }
 
-    .source-card a {
+    .small a {
       color: var(--blue);
-      font-weight: 800;
+      font-weight: 750;
       text-decoration: none;
     }
 
-    .source-card a:hover {
-      text-decoration: underline;
-    }
-
-    .typing {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      min-height: 22px;
-    }
-
     .typing span {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #94a3b8;
       display: inline-block;
-      animation: bounce 1.2s infinite ease-in-out;
+      width: 7px;
+      height: 7px;
+      margin-right: 5px;
+      border-radius: 999px;
+      background: #94a3b8;
+      animation: blink 1.1s infinite ease-in-out;
     }
 
-    .typing span:nth-child(2) { animation-delay: 0.15s; }
-    .typing span:nth-child(3) { animation-delay: 0.3s; }
+    .typing span:nth-child(2) { animation-delay: 0.16s; }
+    .typing span:nth-child(3) { animation-delay: 0.32s; }
 
-    @keyframes bounce {
-      0%, 80%, 100% { transform: translateY(0); opacity: 0.45; }
-      40% { transform: translateY(-5px); opacity: 1; }
+    @keyframes blink {
+      0%, 80%, 100% { opacity: 0.35; transform: translateY(0); }
+      40% { opacity: 1; transform: translateY(-4px); }
     }
 
     @media (max-width: 1050px) {
@@ -318,101 +297,87 @@
       .app {
         height: auto;
         min-height: 100vh;
-        grid-template-columns: 1fr;
-        grid-template-rows: auto auto auto auto;
+        display: block;
       }
-      .header, .sidebar, .chat, .composer, .right {
-        grid-column: 1;
-        grid-row: auto;
+      header {
+        display: block;
       }
-      .sidebar, .right {
-        border: none;
+      aside.left, aside.right {
+        border: 0;
         border-bottom: 1px solid var(--border);
       }
       .chat {
         min-height: 55vh;
       }
+      .composer {
+        position: sticky;
+        bottom: 0;
+      }
       .bubble {
         max-width: 92%;
-      }
-      .composer {
-        flex-direction: column;
-      }
-      .btn {
-        width: 100%;
       }
     }
   </style>
 </head>
+
 <body>
   <main class="app">
-    <header class="header">
-      <div class="header-top">
-        <div>
-          <h1>WANG-AXIS AI Lab Manager</h1>
-          <div class="subtitle">
-            Ask operational and analytical questions about lab resources, GPUs, datasets, inventory rooms,
-            GitHub repositories, and TA/RA role information. Factual answers are grounded in live lab data.
-          </div>
+    <header>
+      <div>
+        <h1>WANG-AXIS AI Lab Manager</h1>
+        <div class="subtitle">
+          Ask about lab inventory, datasets, GPUs, GitHub repositories, and TA/RA roles.
+          The assistant uses live lab data for factual questions and keeps memory within the current chat.
         </div>
-        <div id="statusPill" class="status-pill">Checking backend...</div>
       </div>
+      <div id="status" class="status">Checking backend...</div>
     </header>
 
-    <aside class="sidebar">
-      <div class="group">
-        <div class="side-title">Resources</div>
-        <button class="quick" onclick="quickAsk('Give me a brief overview of the lab resources.')">Lab resource overview</button>
-        <button class="quick" onclick="quickAsk('Tell me about lab inventory and rooms.')">Inventory and rooms</button>
-        <button class="quick" onclick="quickAsk('Summarize the lab GitHub repositories.')">GitHub repositories</button>
-      </div>
+    <aside class="left">
+      <div class="section-title">Resources</div>
+      <button class="quick" data-q="Give me a brief overview of the lab resources.">Lab overview</button>
+      <button class="quick" data-q="Tell me details about lab inventory.">Inventory details</button>
+      <button class="quick" data-q="Summarize the lab GitHub repositories.">GitHub repositories</button>
 
-      <div class="group">
-        <div class="side-title">GPU Manager</div>
-        <button class="quick" onclick="quickAsk('Which GPUs are available right now?')">Available GPUs</button>
-        <button class="quick" onclick="quickAsk('Which GPUs are being used now?')">Active GPUs</button>
-        <button class="quick" onclick="quickAsk('Which GPU should I use for a large language model experiment and why?')">GPU recommendation</button>
-      </div>
+      <div class="section-title">GPU Manager</div>
+      <button class="quick" data-q="Which GPUs are available right now?">Available GPUs</button>
+      <button class="quick" data-q="Which GPUs are being used now?">Active GPUs</button>
+      <button class="quick" data-q="Which GPU should I use for a large language model experiment and why?">GPU recommendation</button>
 
-      <div class="group">
-        <div class="side-title">Datasets</div>
-        <button class="quick" onclick="quickAsk('List all lab datasets with names and sizes.')">Dataset list</button>
-        <button class="quick" onclick="quickAsk('In the datasets, is there any medical imaging related dataset?')">Medical imaging datasets</button>
-        <button class="quick" onclick="quickAsk('Which datasets are most suitable for chest CT vision-language modeling?')">Dataset suitability</button>
-      </div>
+      <div class="section-title">Datasets</div>
+      <button class="quick" data-q="List all lab datasets with names and sizes.">Dataset list</button>
+      <button class="quick" data-q="In the datasets, is there any medical imaging related dataset?">Medical imaging datasets</button>
+      <button class="quick" data-q="Which datasets are most suitable for chest CT vision-language modeling?">Dataset suitability</button>
 
-      <div class="group">
-        <div class="side-title">People and Roles</div>
-        <button class="quick" onclick="quickAsk('Summarize the current student TA and RA roles.')">TA/RA summary</button>
-        <button class="quick" onclick="quickAsk('Who served as TA and in which terms?')">TA assignments</button>
-        <button class="quick" onclick="quickAsk('Who has mostly been RA versus TA?')">Role analysis</button>
-      </div>
+      <div class="section-title">People and Roles</div>
+      <button class="quick" data-q="Summarize the current student TA and RA roles.">TA/RA summary</button>
+      <button class="quick" data-q="Who served as TA and in which terms?">TA assignments</button>
+      <button class="quick" data-q="How many RA term assignments did Manik have?">Manik RA count</button>
     </aside>
 
     <section id="chat" class="chat"></section>
 
     <section class="composer">
-      <input id="q" class="input" type="text" placeholder="Ask the AI Lab Manager a question..." />
-      <button id="askBtn" class="btn">Ask</button>
-      <button id="copyBtn" class="btn secondary" onclick="copyLastAnswer()">Copy</button>
+      <input id="question" type="text" placeholder="Ask the AI Lab Manager..." autocomplete="off" />
+      <button id="askBtn" class="ask" type="button">Ask</button>
+      <button id="copyBtn" class="copy" type="button">Copy</button>
     </section>
 
     <aside class="right">
       <div class="card">
-        <h3>Answer behavior</h3>
+        <h3>Answer mode</h3>
         <div class="small">
-          Counts, lists, roles, GPU status, and inventory lookups use exact database-grounded answers.
-          Recommendation or comparison questions use retrieved facts with LLM synthesis.
+          Factual questions use exact database answers. Follow-up questions use recent chat memory.
         </div>
       </div>
 
-      <div class="card source-card">
+      <div class="card">
         <h3>Last reference</h3>
         <div id="lastSource" class="small">No answer yet.</div>
       </div>
 
       <div class="card">
-        <h3>Useful references</h3>
+        <h3>Reference pages</h3>
         <div class="small">
           <p><a href="https://wang-axis.github.io/" target="_blank" rel="noopener noreferrer">WANG-AXIS Lab Website</a></p>
           <p><a href="https://wang-axis.github.io/datasets/" target="_blank" rel="noopener noreferrer">Lab Datasets Page</a></p>
@@ -429,74 +394,80 @@
     const DEMO_TOKEN = "wangaxis-demo";
 
     const chat = document.getElementById("chat");
-    const input = document.getElementById("q");
+    const questionInput = document.getElementById("question");
     const askBtn = document.getElementById("askBtn");
-    const statusPill = document.getElementById("statusPill");
-    const lastSource = document.getElementById("lastSource");
+    const copyBtn = document.getElementById("copyBtn");
+    const statusEl = document.getElementById("status");
+    const lastSourceEl = document.getElementById("lastSource");
 
-    let lastAnswer = "";
     let chatMemory = [];
+    let lastAnswer = "";
 
-    function escapeHtml(text) {
-      return String(text)
+    function escapeHtml(value) {
+      return String(value || "")
         .replaceAll("&", "&amp;")
         .replaceAll("<", "&lt;")
         .replaceAll(">", "&gt;");
     }
 
-    function addMessage(role, text, meta = null) {
+    function buildHistoryPayload() {
+      return chatMemory.slice(-12).map(function(m) {
+        const topic = m.topic ? " | Topic: " + m.topic : "";
+        const interpreted = m.interpreted_query ? " | Interpreted: " + m.interpreted_query : "";
+        return m.role.toUpperCase() + topic + interpreted + ": " + m.content;
+      }).join("\n");
+    }
+
+    function addMessage(role, text, meta) {
       const row = document.createElement("div");
-      row.className = "msg-row " + role;
+      row.className = "row " + role;
 
       const bubble = document.createElement("div");
       bubble.className = "bubble";
       bubble.innerHTML = escapeHtml(text);
 
-      if (meta && role === "assistant") {
+      if (role === "assistant" && meta) {
         const metaDiv = document.createElement("div");
-        metaDiv.className = "answer-meta";
+        metaDiv.className = "meta";
 
         if (meta.mode) {
-          const m = document.createElement("span");
-          m.className = "meta-chip";
-          m.textContent = meta.mode;
-          metaDiv.appendChild(m);
+          const chip = document.createElement("span");
+          chip.className = "chip";
+          chip.textContent = meta.mode;
+          metaDiv.appendChild(chip);
         }
 
         if (meta.topic) {
-          const t = document.createElement("span");
-          t.className = "meta-chip";
-          t.textContent = "Topic: " + meta.topic;
-          metaDiv.appendChild(t);
+          const chip = document.createElement("span");
+          chip.className = "chip";
+          chip.textContent = "Topic: " + meta.topic;
+          metaDiv.appendChild(chip);
         }
 
-        if (meta.interpreted_query && meta.interpreted_query.length > 0) {
-          const iq = document.createElement("span");
-          iq.className = "meta-chip";
-          iq.textContent = "Memory-aware";
-          iq.title = meta.interpreted_query;
-          metaDiv.appendChild(iq);
+        if (meta.interpreted_query) {
+          const chip = document.createElement("span");
+          chip.className = "chip";
+          chip.textContent = "Memory-aware";
+          chip.title = meta.interpreted_query;
+          metaDiv.appendChild(chip);
         }
 
         if (meta.source_page) {
-          const source = meta.source_page;
-          if (source.url) {
-            const a = document.createElement("a");
-            a.className = "source-a";
-            a.href = source.url;
-            a.target = "_blank";
-            a.rel = "noopener noreferrer";
-            a.textContent = "Reference page: " + source.label;
-            metaDiv.appendChild(a);
-
-            lastSource.innerHTML = '<a href="' + source.url + '" target="_blank" rel="noopener noreferrer">' + source.label + '</a>';
+          if (meta.source_page.url) {
+            const link = document.createElement("a");
+            link.className = "source-link";
+            link.href = meta.source_page.url;
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+            link.textContent = "Reference page: " + meta.source_page.label;
+            metaDiv.appendChild(link);
+            lastSourceEl.innerHTML = '<a href="' + meta.source_page.url + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(meta.source_page.label) + '</a>';
           } else {
-            const s = document.createElement("span");
-            s.className = "meta-chip";
-            s.textContent = "Reference source: " + source.label;
-            metaDiv.appendChild(s);
-
-            lastSource.textContent = source.label;
+            const chip = document.createElement("span");
+            chip.className = "chip";
+            chip.textContent = "Reference: " + meta.source_page.label;
+            metaDiv.appendChild(chip);
+            lastSourceEl.textContent = meta.source_page.label;
           }
         }
 
@@ -511,12 +482,12 @@
 
     function addTyping() {
       const row = document.createElement("div");
-      row.className = "msg-row assistant";
+      row.className = "row assistant";
       row.id = "typingRow";
 
       const bubble = document.createElement("div");
       bubble.className = "bubble";
-      bubble.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+      bubble.innerHTML = '<span class="typing"><span></span><span></span><span></span></span>';
 
       row.appendChild(bubble);
       chat.appendChild(row);
@@ -524,57 +495,48 @@
     }
 
     function removeTyping() {
-      const t = document.getElementById("typingRow");
-      if (t) t.remove();
+      const row = document.getElementById("typingRow");
+      if (row) row.remove();
     }
 
     async function checkBackend() {
       try {
-        const res = await fetch(API_BASE + "/health");
+        const res = await fetch(API_BASE + "/health", { cache: "no-store" });
         const data = await res.json();
+
         if (data.ok) {
-          statusPill.textContent = "Backend online";
-          statusPill.style.background = "#ecfdf5";
-          statusPill.style.borderColor = "#bbf7d0";
-          statusPill.style.color = "#166534";
+          statusEl.textContent = "Backend online";
+          statusEl.style.background = "#ecfdf5";
+          statusEl.style.borderColor = "#bbf7d0";
+          statusEl.style.color = "#166534";
         } else {
-          throw new Error("not ok");
+          throw new Error("Backend returned not-ok");
         }
-      } catch (e) {
-        statusPill.textContent = "Backend offline";
-        statusPill.style.background = "#fef2f2";
-        statusPill.style.borderColor = "#fecaca";
-        statusPill.style.color = "#991b1b";
+      } catch (err) {
+        statusEl.textContent = "Backend offline";
+        statusEl.style.background = "#fef2f2";
+        statusEl.style.borderColor = "#fecaca";
+        statusEl.style.color = "#991b1b";
       }
     }
 
-    
-
-
-    function buildHistoryPayload() {
-      return chatMemory.slice(-12).map(m => {
-        const topic = m.topic ? " | Topic: " + m.topic : "";
-        const interpreted = m.interpreted_query ? " | Interpreted: " + m.interpreted_query : "";
-        return m.role.toUpperCase() + topic + interpreted + ": " + m.content;
-      }).join("
-");
-    }
-
-    async function sendQuestion(qText = null) {
-      const q = (qText !== null ? qText : input.value).trim();
+    async function sendQuestion(text) {
+      const q = String(text || questionInput.value || "").trim();
       if (!q) return;
 
       addMessage("user", q);
-      chatMemory.push({role: "user", content: q});
-      input.value = "";
-      input.focus();
+      chatMemory.push({ role: "user", content: q });
+      questionInput.value = "";
+      questionInput.focus();
+
       askBtn.disabled = true;
       addTyping();
 
       try {
         const h = buildHistoryPayload();
         const url = API_BASE + "/chat?q=" + encodeURIComponent(q) + "&h=" + encodeURIComponent(h) + "&token=" + encodeURIComponent(DEMO_TOKEN);
-        const res = await fetch(url);
+
+        const res = await fetch(url, { cache: "no-store" });
         const data = await res.json();
 
         removeTyping();
@@ -587,49 +549,58 @@
         lastAnswer = data.answer || "";
         chatMemory.push({
           role: "assistant",
-          content: lastAnswer || "",
+          content: lastAnswer,
           topic: data.topic || "",
           interpreted_query: data.interpreted_query || ""
         });
+
         addMessage("assistant", lastAnswer || "No answer returned.", {
           mode: data.mode,
           topic: data.topic,
-          source_page: data.source_page,
-          interpreted_query: data.interpreted_query
+          interpreted_query: data.interpreted_query,
+          source_page: data.source_page
         });
-      } catch (e) {
+
+      } catch (err) {
         removeTyping();
-        addMessage("assistant", "The AI Lab Manager could not be reached right now. The model server or public tunnel may be offline.");
+        addMessage("assistant", "The AI Lab Manager could not be reached. The backend tunnel may be offline or blocked by the browser.");
+        console.error(err);
       } finally {
         askBtn.disabled = false;
       }
     }
 
-    function quickAsk(text) {
-      input.value = text;
-      sendQuestion(text);
-    }
-
     async function copyLastAnswer() {
       if (!lastAnswer) return;
       await navigator.clipboard.writeText(lastAnswer);
-      const old = document.getElementById("copyBtn").textContent;
-      document.getElementById("copyBtn").textContent = "Copied";
-      setTimeout(() => document.getElementById("copyBtn").textContent = old, 1000);
+      const old = copyBtn.textContent;
+      copyBtn.textContent = "Copied";
+      setTimeout(function() { copyBtn.textContent = old; }, 900);
     }
 
-    askBtn.addEventListener("click", () => sendQuestion());
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") sendQuestion();
+    askBtn.addEventListener("click", function() {
+      sendQuestion();
     });
 
-    addMessage(
-      "assistant",
-      "Hello. I am the WANG-AXIS AI Lab Manager. I can answer factual questions from lab data and help reason across datasets, GPUs, inventory, repositories, and TA/RA roles."
-    );
+    copyBtn.addEventListener("click", copyLastAnswer);
 
+    questionInput.addEventListener("keydown", function(e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        sendQuestion();
+      }
+    });
+
+    document.querySelectorAll(".quick").forEach(function(btn) {
+      btn.addEventListener("click", function() {
+        sendQuestion(btn.getAttribute("data-q"));
+      });
+    });
+
+    addMessage("assistant", "Hello. I am the WANG-AXIS AI Lab Manager. Ask me about lab inventory, datasets, GPUs, GitHub repositories, or TA/RA roles.");
     checkBackend();
   </script>
-  <!-- deploy-marker: 2026-05-01T19:11:32.848552+00:00 -->
+
+  <!-- deploy-marker: frontend-working-reset-20260501T191411Z -->
 </body>
 </html>
