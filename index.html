@@ -9,79 +9,64 @@
       box-sizing: border-box;
     }
 
-    body {
+    html, body {
       margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
+      min-height: 100%;
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      color: #0f172a;
+    }
+
+    body {
       background:
-        radial-gradient(circle at top left, #eef4ff 0%, #f7f9fc 45%, #eef2f7 100%);
-      color: #1f2937;
-    }
-
-    .page {
-      max-width: 980px;
-      margin: 28px auto;
-      padding: 0 16px;
-    }
-
-    .shell {
-      background: rgba(255,255,255,0.92);
-      border: 1px solid #e5e7eb;
-      border-radius: 22px;
-      box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+        radial-gradient(circle at 10% 20%, rgba(96, 165, 250, 0.35), transparent 32%),
+        radial-gradient(circle at 85% 15%, rgba(168, 85, 247, 0.26), transparent 30%),
+        radial-gradient(circle at 55% 85%, rgba(45, 212, 191, 0.24), transparent 34%),
+        linear-gradient(135deg, #f8fbff 0%, #eef4ff 48%, #f9f7ff 100%);
       overflow: hidden;
-      backdrop-filter: blur(8px);
     }
 
-    .hero {
-      padding: 26px 28px 18px;
-      background: linear-gradient(135deg, #ffffff 0%, #f3f7ff 100%);
-      border-bottom: 1px solid #e5e7eb;
+    .app {
+      width: 100vw;
+      height: 100vh;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      background: rgba(255, 255, 255, 0.58);
+      backdrop-filter: blur(18px);
+    }
+
+    .topbar {
+      padding: 24px 34px 18px;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+      background: rgba(255, 255, 255, 0.72);
     }
 
     .title {
       margin: 0;
-      font-size: 2.1rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
+      font-size: 2.05rem;
+      font-weight: 850;
+      letter-spacing: -0.035em;
       color: #0f172a;
     }
 
     .subtitle {
-      margin-top: 10px;
-      font-size: 1rem;
-      color: #5b6472;
+      max-width: 980px;
+      margin-top: 8px;
+      font-size: 0.98rem;
       line-height: 1.55;
-      max-width: 880px;
+      color: #5f6b7a;
     }
 
-    .badge-row {
-      margin-top: 16px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .badge {
-      background: #eef2ff;
-      color: #374151;
-      border: 1px solid #dbe3ff;
-      border-radius: 999px;
-      padding: 7px 12px;
-      font-size: 0.88rem;
-      font-weight: 600;
-    }
-
-    .shortcut-wrap {
-      padding: 18px 22px 8px;
-      border-bottom: 1px solid #edf0f5;
-      background: #fbfcfe;
+    .shortcuts {
+      padding: 16px 34px;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.85);
+      background: rgba(248, 251, 255, 0.65);
     }
 
     .shortcut-label {
-      font-size: 0.92rem;
-      font-weight: 700;
-      color: #6b7280;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
+      font-size: 0.88rem;
+      font-weight: 750;
+      color: #64748b;
     }
 
     .chips {
@@ -91,34 +76,33 @@
     }
 
     .chip {
-      border: 1px solid #dbe4f3;
-      background: white;
+      border: 1px solid rgba(203, 213, 225, 0.92);
+      background: rgba(255, 255, 255, 0.82);
       color: #334155;
-      padding: 10px 14px;
+      padding: 9px 14px;
       border-radius: 999px;
-      font-size: 0.93rem;
-      font-weight: 600;
+      font-size: 0.92rem;
+      font-weight: 650;
       cursor: pointer;
-      transition: all 0.18s ease;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+      transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
     }
 
     .chip:hover {
-      background: #eef4ff;
-      border-color: #bfd2ff;
       transform: translateY(-1px);
+      border-color: #93c5fd;
+      background: #ffffff;
     }
 
-    .chat-area {
-      padding: 18px 18px 0;
-      height: 520px;
+    .chat {
       overflow-y: auto;
-      background: linear-gradient(180deg, #fbfcff 0%, #f7f9fc 100%);
+      padding: 28px 34px 22px;
+      scroll-behavior: smooth;
     }
 
     .msg-row {
       display: flex;
-      margin-bottom: 16px;
+      margin-bottom: 18px;
     }
 
     .msg-row.user {
@@ -130,9 +114,9 @@
     }
 
     .bubble {
-      max-width: min(78%, 760px);
-      padding: 14px 16px;
-      border-radius: 18px;
+      max-width: min(760px, 78vw);
+      padding: 15px 17px;
+      border-radius: 20px;
       line-height: 1.55;
       white-space: pre-wrap;
       word-wrap: break-word;
@@ -140,74 +124,79 @@
     }
 
     .msg-row.user .bubble {
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
       color: white;
-      border-bottom-right-radius: 6px;
-      box-shadow: 0 8px 22px rgba(37, 99, 235, 0.20);
+      border-bottom-right-radius: 7px;
+      box-shadow: 0 12px 28px rgba(37, 99, 235, 0.22);
     }
 
     .msg-row.assistant .bubble {
-      background: white;
+      background: rgba(255, 255, 255, 0.88);
       color: #1f2937;
-      border: 1px solid #e6ebf2;
-      border-bottom-left-radius: 6px;
-      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
+      border: 1px solid rgba(226, 232, 240, 0.95);
+      border-bottom-left-radius: 7px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
     }
 
-    .meta {
-      margin-top: 10px;
+    .source-link {
+      margin-top: 12px;
       padding-top: 10px;
-      border-top: 1px solid #edf0f5;
-      font-size: 0.82rem;
-      color: #6b7280;
+      border-top: 1px solid #e5e7eb;
+      font-size: 0.84rem;
+      color: #64748b;
+      white-space: normal;
+    }
+
+    .source-link a {
+      color: #2563eb;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .source-link a:hover {
+      text-decoration: underline;
     }
 
     .composer {
-      padding: 16px 18px 18px;
-      border-top: 1px solid #e8edf5;
-      background: white;
       display: flex;
       gap: 12px;
-      align-items: center;
+      padding: 18px 34px 24px;
+      border-top: 1px solid rgba(226, 232, 240, 0.9);
+      background: rgba(255, 255, 255, 0.78);
     }
 
     .input {
       flex: 1;
-      border: 1px solid #d9e2ef;
-      border-radius: 14px;
-      padding: 14px 15px;
+      border: 1px solid #cbd5e1;
+      border-radius: 16px;
+      padding: 15px 16px;
       font-size: 0.98rem;
       outline: none;
+      background: rgba(255, 255, 255, 0.94);
       transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
 
     .input:focus {
-      border-color: #7aa2ff;
-      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.10);
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.18);
     }
 
     .btn {
       border: none;
-      border-radius: 14px;
-      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      border-radius: 16px;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
       color: white;
       font-size: 0.98rem;
-      font-weight: 700;
-      padding: 14px 20px;
+      font-weight: 800;
+      padding: 15px 22px;
       cursor: pointer;
-      min-width: 92px;
-      box-shadow: 0 10px 20px rgba(37, 99, 235, 0.18);
+      min-width: 94px;
+      box-shadow: 0 12px 25px rgba(37, 99, 235, 0.22);
     }
 
-    .btn:hover {
-      filter: brightness(1.03);
-    }
-
-    .footer-note {
-      padding: 0 18px 18px;
-      font-size: 0.82rem;
-      color: #6b7280;
-      background: white;
+    .btn:disabled {
+      opacity: 0.62;
+      cursor: not-allowed;
     }
 
     .typing {
@@ -240,17 +229,30 @@
     }
 
     @media (max-width: 720px) {
+      body {
+        overflow: auto;
+      }
+
+      .app {
+        min-height: 100vh;
+        height: auto;
+      }
+
+      .topbar, .shortcuts, .chat, .composer {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+
       .title {
-        font-size: 1.7rem;
+        font-size: 1.65rem;
       }
 
       .bubble {
-        max-width: 88%;
+        max-width: 90vw;
       }
 
       .composer {
         flex-direction: column;
-        align-items: stretch;
       }
 
       .btn {
@@ -260,56 +262,66 @@
   </style>
 </head>
 <body>
-  <div class="page">
-    <div class="shell">
-      <div class="hero">
-        <h1 class="title">WANG-AXIS Lab Chatbot</h1>
-        <div class="subtitle">
-          Ask about lab resources, GPU availability, datasets, inventory rooms, GitHub repositories, and TA/RA role information through a public demo interface.
-        </div>
-        <div class="badge-row">
-          <span class="badge">Public demo</span>
-          <span class="badge">LoRA-based assistant</span>
-          <span class="badge">Database-grounded answers</span>
-        </div>
+  <main class="app">
+    <header class="topbar">
+      <h1 class="title">WANG-AXIS Lab Chatbot</h1>
+      <div class="subtitle">
+        Ask about lab resources, GPU availability, datasets, inventory rooms, GitHub repositories, and TA/RA role information.
       </div>
+    </header>
 
-      <div class="shortcut-wrap">
-        <div class="shortcut-label">Try these example questions</div>
-        <div class="chips">
-          <button class="chip" onclick="quickAsk('Give me a brief overview of the lab resources.')">Lab overview</button>
-          <button class="chip" onclick="quickAsk('Which GPUs are available right now?')">Available GPUs</button>
-          <button class="chip" onclick="quickAsk('Which GPUs are being used now?')">Active GPUs</button>
-          <button class="chip" onclick="quickAsk('Summarize the current student TA and RA roles.')">Student roles</button>
-          <button class="chip" onclick="quickAsk('Who served as TA and in which terms?')">TA assignments</button>
-          <button class="chip" onclick="quickAsk('List all lab datasets with names and sizes.')">Datasets</button>
-          <button class="chip" onclick="quickAsk('How many rooms are associated with the lab inventory?')">Inventory rooms</button>
-          <button class="chip" onclick="quickAsk('Summarize the lab GitHub repositories.')">GitHub repos</button>
-        </div>
+    <section class="shortcuts">
+      <div class="shortcut-label">Example questions</div>
+      <div class="chips">
+        <button class="chip" onclick="quickAsk('Give me a brief overview of the lab resources.')">Lab overview</button>
+        <button class="chip" onclick="quickAsk('Which GPUs are available right now?')">Available GPUs</button>
+        <button class="chip" onclick="quickAsk('Which GPUs are being used now?')">Active GPUs</button>
+        <button class="chip" onclick="quickAsk('Summarize the current student TA and RA roles.')">Student roles</button>
+        <button class="chip" onclick="quickAsk('Who served as TA and in which terms?')">TA assignments</button>
+        <button class="chip" onclick="quickAsk('List all lab datasets with names and sizes.')">Datasets</button>
+        <button class="chip" onclick="quickAsk('How many rooms are associated with the lab inventory?')">Inventory rooms</button>
+        <button class="chip" onclick="quickAsk('Summarize the lab GitHub repositories.')">GitHub repositories</button>
       </div>
+    </section>
 
-      <div id="chat" class="chat-area"></div>
+    <section id="chat" class="chat"></section>
 
-      <div class="composer">
-        <input id="q" class="input" type="text" placeholder="Ask about WANG-AXIS lab resources..." />
-        <button id="askBtn" class="btn">Ask</button>
-      </div>
-
-      <div class="footer-note">
-        This GitHub Pages frontend connects to a live public backend tunnel. If the backend restarts, the API link may need to be updated.
-      </div>
-    </div>
-  </div>
+    <section class="composer">
+      <input id="q" class="input" type="text" placeholder="Ask about WANG-AXIS lab resources..." />
+      <button id="askBtn" class="btn">Ask</button>
+    </section>
+  </main>
 
   <script>
     const API_BASE = "https://infections-deborah-patterns-maiden.trycloudflare.com";
     const DEMO_TOKEN = "wangaxis-demo";
 
+    const SOURCE_PAGES = {
+      gpu: { label: "Lab GPU Scheduler Dashboard", url: "https://mwnafee.github.io/lab-gpu-scheduler-dashboard/" },
+      roles: { label: "TA/RA Roles Dashboard", url: "https://mwnafee.github.io/wanglab_phd_roles/" },
+      datasets: { label: "Lab Datasets Page", url: "https://wang-axis.github.io/datasets/" },
+      github: { label: "WANG-AXIS GitHub Organization", url: "https://github.com/WANG-AXIS" },
+      inventory: { label: "Lab Inventory Source Page", url: "https://wang-axis.github.io/datasets/" },
+      overview: { label: "WANG-AXIS Lab Website", url: "https://wang-axis.github.io/" }
+    };
+
     const chat = document.getElementById("chat");
     const input = document.getElementById("q");
     const askBtn = document.getElementById("askBtn");
 
-    function addMessage(role, text, meta="") {
+    function inferSource(question, data) {
+      const q = question.toLowerCase();
+      const topic = String(data.topic || "").toLowerCase();
+
+      if (q.includes("gpu") || topic.includes("gpu")) return SOURCE_PAGES.gpu;
+      if (q.includes("ta") || q.includes("ra") || q.includes("student") || q.includes("role") || topic.includes("role")) return SOURCE_PAGES.roles;
+      if (q.includes("dataset") || topic.includes("dataset")) return SOURCE_PAGES.datasets;
+      if (q.includes("github") || q.includes("repo") || topic.includes("github") || topic.includes("repo")) return SOURCE_PAGES.github;
+      if (q.includes("room") || q.includes("inventory") || topic.includes("inventory")) return SOURCE_PAGES.inventory;
+      return SOURCE_PAGES.overview;
+    }
+
+    function addMessage(role, text, source=null) {
       const row = document.createElement("div");
       row.className = "msg-row " + role;
 
@@ -317,11 +329,11 @@
       bubble.className = "bubble";
       bubble.textContent = text;
 
-      if (meta) {
-        const metaDiv = document.createElement("div");
-        metaDiv.className = "meta";
-        metaDiv.textContent = meta;
-        bubble.appendChild(metaDiv);
+      if (source && source.url && role === "assistant") {
+        const sourceDiv = document.createElement("div");
+        sourceDiv.className = "source-link";
+        sourceDiv.innerHTML = 'Reference page: <a href="' + source.url + '" target="_blank" rel="noopener noreferrer">' + source.label + '</a>';
+        bubble.appendChild(sourceDiv);
       }
 
       row.appendChild(bubble);
@@ -361,6 +373,7 @@
       addMessage("user", q);
       input.value = "";
       input.focus();
+      askBtn.disabled = true;
 
       addTyping();
 
@@ -376,14 +389,13 @@
           return;
         }
 
-        let meta = [];
-        if (data.mode) meta.push("Mode: " + data.mode);
-        if (data.topic) meta.push("Topic: " + data.topic);
-
-        addMessage("assistant", data.answer || "No answer returned.", meta.join(" | "));
+        const source = inferSource(q, data);
+        addMessage("assistant", data.answer || "No answer returned.", source);
       } catch (err) {
         removeTyping();
         addMessage("assistant", "The chatbot could not be reached right now. Please try again in a moment.");
+      } finally {
+        askBtn.disabled = false;
       }
     }
 
@@ -399,7 +411,8 @@
 
     addMessage(
       "assistant",
-      "Hello. I am the WANG-AXIS Lab Chatbot. You can ask me about lab resources, GPUs, datasets, inventory rooms, GitHub repositories, and TA/RA roles."
+      "Hello. I am the WANG-AXIS Lab Chatbot. You can ask me about lab resources, GPUs, datasets, inventory rooms, GitHub repositories, and TA/RA roles.",
+      SOURCE_PAGES.overview
     );
   </script>
 </body>
