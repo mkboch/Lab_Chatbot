@@ -36,6 +36,14 @@
       line-height: 1.5;
       font-size: 14px;
     }
+    .shortcut-label {
+      padding: 16px 18px 0;
+      background: white;
+      color: #6b7280;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
     .chips {
       display: flex;
       flex-wrap: wrap;
@@ -145,14 +153,15 @@
         </p>
       </div>
 
+      <div class="shortcut-label">Quick shortcuts</div>
       <div class="chips">
-        <span class="chip" onclick="setQ('tell me about axis lab')">Lab overview</span>
-        <span class="chip" onclick="setQ('which gpu are being used now?')">Busy GPUs</span>
-        <span class="chip" onclick="setQ('which GPUs are free right now?')">Free GPUs</span>
-        <span class="chip" onclick="setQ('tell me about student roles')">Student roles</span>
-        <span class="chip" onclick="setQ('how many RA did Manik do?')">Manik RA count</span>
-        <span class="chip" onclick="setQ('who did TA in which term?')">TA terms</span>
-        <span class="chip" onclick="setQ('tell me all dataset names and sizes')">Datasets</span>
+        <span class="chip" onclick="setQ('give me a summary of the WANG-AXIS lab')">Lab summary</span>
+        <span class="chip" onclick="setQ('summarize current GPU usage')">GPU status</span>
+        <span class="chip" onclick="setQ('which GPUs are available right now?')">Available GPUs</span>
+        <span class="chip" onclick="setQ('summarize student TA and RA roles')">Student role summary</span>
+        <span class="chip" onclick="setQ('how many RA terms did Manik do?')">Manik role check</span>
+        <span class="chip" onclick="setQ('who served as TA and in which terms?')">TA assignments</span>
+        <span class="chip" onclick="setQ('list all lab datasets with names and sizes')">Dataset list</span>
       </div>
 
       <div id="messages" class="messages"></div>
