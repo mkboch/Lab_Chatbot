@@ -5,249 +5,402 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>WANG-AXIS Lab Chatbot</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f4f7fb;
-      color: #111827;
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at top left, #eef4ff 0%, #f7f9fc 45%, #eef2f7 100%);
+      color: #1f2937;
     }
+
     .page {
       max-width: 980px;
-      margin: 0 auto;
-      padding: 28px;
+      margin: 28px auto;
+      padding: 0 16px;
     }
-    .card {
-      background: white;
-      border-radius: 20px;
-      box-shadow: 0 12px 34px rgba(15, 23, 42, 0.12);
+
+    .shell {
+      background: rgba(255,255,255,0.92);
+      border: 1px solid #e5e7eb;
+      border-radius: 22px;
+      box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
       overflow: hidden;
+      backdrop-filter: blur(8px);
     }
-    .header {
-      padding: 24px 26px;
+
+    .hero {
+      padding: 26px 28px 18px;
+      background: linear-gradient(135deg, #ffffff 0%, #f3f7ff 100%);
       border-bottom: 1px solid #e5e7eb;
     }
-    .header h1 {
-      margin: 0 0 8px;
-      font-size: 26px;
-    }
-    .header p {
+
+    .title {
       margin: 0;
-      color: #6b7280;
-      line-height: 1.5;
-      font-size: 14px;
+      font-size: 2.1rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #0f172a;
     }
-    .shortcut-label {
-      padding: 16px 18px 0;
-      background: white;
-      color: #6b7280;
-      font-size: 13px;
+
+    .subtitle {
+      margin-top: 10px;
+      font-size: 1rem;
+      color: #5b6472;
+      line-height: 1.55;
+      max-width: 880px;
+    }
+
+    .badge-row {
+      margin-top: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .badge {
+      background: #eef2ff;
+      color: #374151;
+      border: 1px solid #dbe3ff;
+      border-radius: 999px;
+      padding: 7px 12px;
+      font-size: 0.88rem;
       font-weight: 600;
-      letter-spacing: 0.01em;
     }
+
+    .shortcut-wrap {
+      padding: 18px 22px 8px;
+      border-bottom: 1px solid #edf0f5;
+      background: #fbfcfe;
+    }
+
+    .shortcut-label {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #6b7280;
+      margin-bottom: 12px;
+    }
+
     .chips {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
-      padding: 16px 18px 0;
-      background: white;
-    }
-    .chip {
-      background: #eef2ff;
-      border: 1px solid #dbeafe;
-      color: #1f2937;
-      padding: 8px 11px;
-      border-radius: 999px;
-      font-size: 13px;
-      cursor: pointer;
-      user-select: none;
-    }
-    .messages {
-      height: 560px;
-      overflow-y: auto;
-      padding: 22px;
-      background: #fbfdff;
-    }
-    .msg {
-      display: flex;
-      margin-bottom: 14px;
-    }
-    .msg.user {
-      justify-content: flex-end;
-    }
-    .bubble {
-      max-width: 78%;
-      padding: 13px 15px;
-      border-radius: 16px;
-      white-space: pre-wrap;
-      line-height: 1.5;
-      font-size: 14px;
-    }
-    .bot .bubble {
-      background: #ffffff;
-      border: 1px solid #e5e7eb;
-    }
-    .user .bubble {
-      background: #2563eb;
-      color: white;
-    }
-    .meta {
-      display: block;
-      margin-top: 10px;
-      font-size: 12px;
-      color: #6b7280;
-      white-space: normal;
-    }
-    .controls {
-      display: flex;
       gap: 10px;
-      padding: 16px;
-      border-top: 1px solid #e5e7eb;
+    }
+
+    .chip {
+      border: 1px solid #dbe4f3;
       background: white;
-    }
-    input {
-      border: 1px solid #d1d5db;
-      border-radius: 12px;
-      padding: 12px 14px;
-      font-size: 14px;
-      outline: none;
-    }
-    #q {
-      flex: 1;
-    }
-    #token {
-      width: 155px;
-    }
-    button {
-      border: 0;
-      border-radius: 12px;
-      padding: 12px 16px;
-      background: #2563eb;
-      color: white;
+      color: #334155;
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 0.93rem;
       font-weight: 600;
       cursor: pointer;
+      transition: all 0.18s ease;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
     }
-    button:disabled {
-      background: #9ca3af;
-      cursor: not-allowed;
+
+    .chip:hover {
+      background: #eef4ff;
+      border-color: #bfd2ff;
+      transform: translateY(-1px);
     }
-    .dots span {
+
+    .chat-area {
+      padding: 18px 18px 0;
+      height: 520px;
+      overflow-y: auto;
+      background: linear-gradient(180deg, #fbfcff 0%, #f7f9fc 100%);
+    }
+
+    .msg-row {
+      display: flex;
+      margin-bottom: 16px;
+    }
+
+    .msg-row.user {
+      justify-content: flex-end;
+    }
+
+    .msg-row.assistant {
+      justify-content: flex-start;
+    }
+
+    .bubble {
+      max-width: min(78%, 760px);
+      padding: 14px 16px;
+      border-radius: 18px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-size: 0.98rem;
+    }
+
+    .msg-row.user .bubble {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      color: white;
+      border-bottom-right-radius: 6px;
+      box-shadow: 0 8px 22px rgba(37, 99, 235, 0.20);
+    }
+
+    .msg-row.assistant .bubble {
+      background: white;
+      color: #1f2937;
+      border: 1px solid #e6ebf2;
+      border-bottom-left-radius: 6px;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
+    }
+
+    .meta {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #edf0f5;
+      font-size: 0.82rem;
+      color: #6b7280;
+    }
+
+    .composer {
+      padding: 16px 18px 18px;
+      border-top: 1px solid #e8edf5;
+      background: white;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .input {
+      flex: 1;
+      border: 1px solid #d9e2ef;
+      border-radius: 14px;
+      padding: 14px 15px;
+      font-size: 0.98rem;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .input:focus {
+      border-color: #7aa2ff;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.10);
+    }
+
+    .btn {
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: white;
+      font-size: 0.98rem;
+      font-weight: 700;
+      padding: 14px 20px;
+      cursor: pointer;
+      min-width: 92px;
+      box-shadow: 0 10px 20px rgba(37, 99, 235, 0.18);
+    }
+
+    .btn:hover {
+      filter: brightness(1.03);
+    }
+
+    .footer-note {
+      padding: 0 18px 18px;
+      font-size: 0.82rem;
+      color: #6b7280;
+      background: white;
+    }
+
+    .typing {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 22px;
+    }
+
+    .typing span {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #94a3b8;
       display: inline-block;
-      animation: pulse 1.2s infinite;
+      animation: bounce 1.2s infinite ease-in-out;
     }
-    .dots span:nth-child(2) { animation-delay: .15s; }
-    .dots span:nth-child(3) { animation-delay: .3s; }
-    @keyframes pulse {
-      0%, 80%, 100% { opacity: .25; transform: translateY(0); }
-      40% { opacity: 1; transform: translateY(-3px); }
+
+    .typing span:nth-child(2) {
+      animation-delay: 0.15s;
+    }
+
+    .typing span:nth-child(3) {
+      animation-delay: 0.3s;
+    }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: translateY(0); opacity: 0.45; }
+      40% { transform: translateY(-5px); opacity: 1; }
+    }
+
+    @media (max-width: 720px) {
+      .title {
+        font-size: 1.7rem;
+      }
+
+      .bubble {
+        max-width: 88%;
+      }
+
+      .composer {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .btn {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
   <div class="page">
-    <div class="card">
-      <div class="header">
-        <h1>WANG-AXIS Lab Chatbot</h1>
-        <p>
-          Trained LoRA chatbot with targeted database grounding for lab inventory,
-          datasets, GitHub repositories, GPU availability, and TA/RA roles.
-        </p>
+    <div class="shell">
+      <div class="hero">
+        <h1 class="title">WANG-AXIS Lab Chatbot</h1>
+        <div class="subtitle">
+          Ask about lab resources, GPU availability, datasets, inventory rooms, GitHub repositories, and TA/RA role information through a public demo interface.
+        </div>
+        <div class="badge-row">
+          <span class="badge">Public demo</span>
+          <span class="badge">LoRA-based assistant</span>
+          <span class="badge">Database-grounded answers</span>
+        </div>
       </div>
 
-      <div class="shortcut-label">Quick shortcuts</div>
-      <div class="chips">
-        <span class="chip" onclick="setQ('give me a summary of the WANG-AXIS lab')">Lab summary</span>
-        <span class="chip" onclick="setQ('summarize current GPU usage')">GPU status</span>
-        <span class="chip" onclick="setQ('which GPUs are available right now?')">Available GPUs</span>
-        <span class="chip" onclick="setQ('summarize student TA and RA roles')">Student role summary</span>
-        <span class="chip" onclick="setQ('how many RA terms did Manik do?')">Manik role check</span>
-        <span class="chip" onclick="setQ('who served as TA and in which terms?')">TA assignments</span>
-        <span class="chip" onclick="setQ('list all lab datasets with names and sizes')">Dataset list</span>
+      <div class="shortcut-wrap">
+        <div class="shortcut-label">Try these example questions</div>
+        <div class="chips">
+          <button class="chip" onclick="quickAsk('Give me a brief overview of the lab resources.')">Lab overview</button>
+          <button class="chip" onclick="quickAsk('Which GPUs are available right now?')">Available GPUs</button>
+          <button class="chip" onclick="quickAsk('Which GPUs are being used now?')">Active GPUs</button>
+          <button class="chip" onclick="quickAsk('Summarize the current student TA and RA roles.')">Student roles</button>
+          <button class="chip" onclick="quickAsk('Who served as TA and in which terms?')">TA assignments</button>
+          <button class="chip" onclick="quickAsk('List all lab datasets with names and sizes.')">Datasets</button>
+          <button class="chip" onclick="quickAsk('How many rooms are associated with the lab inventory?')">Inventory rooms</button>
+          <button class="chip" onclick="quickAsk('Summarize the lab GitHub repositories.')">GitHub repos</button>
+        </div>
       </div>
 
-      <div id="messages" class="messages"></div>
+      <div id="chat" class="chat-area"></div>
 
-      <div class="controls">
-        <input id="token" value="wangaxis-demo" placeholder="Demo token" />
-        <input id="q" placeholder="Ask about WANG-AXIS lab resources..." onkeydown="if(event.key==='Enter') ask()" />
-        <button id="send" onclick="ask()">Ask</button>
+      <div class="composer">
+        <input id="q" class="input" type="text" placeholder="Ask about WANG-AXIS lab resources..." />
+        <button id="askBtn" class="btn">Ask</button>
+      </div>
+
+      <div class="footer-note">
+        This GitHub Pages frontend connects to a live public backend tunnel. If the backend restarts, the API link may need to be updated.
       </div>
     </div>
   </div>
 
   <script>
     const API_BASE = "https://infections-deborah-patterns-maiden.trycloudflare.com";
-    const history = [];
+    const DEMO_TOKEN = "wangaxis-demo";
 
-    function addMessage(role, text, meta) {
-      const messages = document.getElementById("messages");
-      const wrap = document.createElement("div");
-      wrap.className = "msg " + role;
+    const chat = document.getElementById("chat");
+    const input = document.getElementById("q");
+    const askBtn = document.getElementById("askBtn");
+
+    function addMessage(role, text, meta="") {
+      const row = document.createElement("div");
+      row.className = "msg-row " + role;
 
       const bubble = document.createElement("div");
       bubble.className = "bubble";
       bubble.textContent = text;
 
       if (meta) {
-        const m = document.createElement("span");
-        m.className = "meta";
-        m.textContent = meta;
-        bubble.appendChild(m);
+        const metaDiv = document.createElement("div");
+        metaDiv.className = "meta";
+        metaDiv.textContent = meta;
+        bubble.appendChild(metaDiv);
       }
 
-      wrap.appendChild(bubble);
-      messages.appendChild(wrap);
-      messages.scrollTop = messages.scrollHeight;
-      return wrap;
+      row.appendChild(bubble);
+      chat.appendChild(row);
+      chat.scrollTop = chat.scrollHeight;
+      return row;
     }
 
-    function setQ(text) {
-      document.getElementById("q").value = text;
-      document.getElementById("q").focus();
+    function addTyping() {
+      const row = document.createElement("div");
+      row.className = "msg-row assistant";
+      row.id = "typingRow";
+
+      const bubble = document.createElement("div");
+      bubble.className = "bubble";
+
+      const typing = document.createElement("div");
+      typing.className = "typing";
+      typing.innerHTML = "<span></span><span></span><span></span>";
+
+      bubble.appendChild(typing);
+      row.appendChild(bubble);
+      chat.appendChild(row);
+      chat.scrollTop = chat.scrollHeight;
+      return row;
     }
 
-    async function ask() {
-      const qEl = document.getElementById("q");
-      const tokenEl = document.getElementById("token");
-      const btn = document.getElementById("send");
+    function removeTyping() {
+      const t = document.getElementById("typingRow");
+      if (t) t.remove();
+    }
 
-      const q = qEl.value.trim();
-      const token = tokenEl.value.trim();
-
+    async function sendQuestion(qText=null) {
+      const q = (qText !== null ? qText : input.value).trim();
       if (!q) return;
 
       addMessage("user", q);
-      history.push("USER: " + q);
-      qEl.value = "";
-      btn.disabled = true;
+      input.value = "";
+      input.focus();
 
-      const thinking = addMessage("bot", "");
-      thinking.querySelector(".bubble").innerHTML = 'Thinking <span class="dots"><span>.</span><span>.</span><span>.</span></span>';
+      addTyping();
 
       try {
-        const h = history.slice(-8).join("\n");
-        const url = API_BASE + "/chat?q=" + encodeURIComponent(q) + "&h=" + encodeURIComponent(h) + "&token=" + encodeURIComponent(token);
-
+        const url = API_BASE + "/chat?q=" + encodeURIComponent(q) + "&token=" + encodeURIComponent(DEMO_TOKEN);
         const res = await fetch(url);
         const data = await res.json();
 
-        thinking.remove();
+        removeTyping();
 
-        if (!res.ok) {
-          addMessage("bot", "Error: " + (data.error || "Request failed."));
+        if (data.error) {
+          addMessage("assistant", "Error: " + data.error);
           return;
         }
 
-        addMessage("bot", data.answer, "Mode: " + data.mode_label + " | Topic: " + data.topic);
-        history.push("ASSISTANT: " + data.answer);
-      } catch (e) {
-        thinking.remove();
-        addMessage("bot", "Could not reach the chatbot API. The model server or public tunnel may be offline.");
-      } finally {
-        btn.disabled = false;
+        let meta = [];
+        if (data.mode) meta.push("Mode: " + data.mode);
+        if (data.topic) meta.push("Topic: " + data.topic);
+
+        addMessage("assistant", data.answer || "No answer returned.", meta.join(" | "));
+      } catch (err) {
+        removeTyping();
+        addMessage("assistant", "The chatbot could not be reached right now. Please try again in a moment.");
       }
     }
 
-    addMessage("bot", "Hello. I am the WANG-AXIS Lab Chatbot. Ask me about datasets, GPU availability, inventory rooms, GitHub repositories, or TA/RA roles.");
+    function quickAsk(text) {
+      input.value = text;
+      sendQuestion(text);
+    }
+
+    askBtn.addEventListener("click", () => sendQuestion());
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") sendQuestion();
+    });
+
+    addMessage(
+      "assistant",
+      "Hello. I am the WANG-AXIS Lab Chatbot. You can ask me about lab resources, GPUs, datasets, inventory rooms, GitHub repositories, and TA/RA roles."
+    );
   </script>
 </body>
 </html>
