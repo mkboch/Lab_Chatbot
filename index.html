@@ -435,6 +435,7 @@
     const lastSource = document.getElementById("lastSource");
 
     let lastAnswer = "";
+    let chatMemory = [];
 
     function escapeHtml(text) {
       return String(text)
@@ -467,6 +468,14 @@
           t.className = "meta-chip";
           t.textContent = "Topic: " + meta.topic;
           metaDiv.appendChild(t);
+        }
+
+        if (meta.interpreted_query && meta.interpreted_query.length > 0) {
+          const iq = document.createElement("span");
+          iq.className = "meta-chip";
+          iq.textContent = "Memory-aware";
+          iq.title = meta.interpreted_query;
+          metaDiv.appendChild(iq);
         }
 
         if (meta.source_page) {
@@ -539,18 +548,28 @@
       }
     }
 
+    
+    function buildHistoryPayload() {
+      return chatMemory.slice(-10).map(m => {
+        const topic = m.topic ? " | Topic: " + m.topic : "";
+        return m.role.toUpperCase() + topic + ": " + m.content;
+      }).join("\n");
+    }
+
     async function sendQuestion(qText = null) {
       const q = (qText !== null ? qText : input.value).trim();
       if (!q) return;
 
       addMessage("user", q);
+      chatMemory.push({role: "user", content: q});
       input.value = "";
       input.focus();
       askBtn.disabled = true;
       addTyping();
 
       try {
-        const url = API_BASE + "/chat?q=" + encodeURIComponent(q) + "&token=" + encodeURIComponent(DEMO_TOKEN);
+        const h = buildHistoryPayload();
+        const url = API_BASE + "/chat?q=" + encodeURIComponent(q) + "&h=" + encodeURIComponent(h) + "&token=" + encodeURIComponent(DEMO_TOKEN);
         const res = await fetch(url);
         const data = await res.json();
 
@@ -562,10 +581,17 @@
         }
 
         lastAnswer = data.answer || "";
+        chatMemory.push({
+          role: "assistant",
+          content: lastAnswer || "",
+          topic: data.topic || "",
+          interpreted_query: data.interpreted_query || ""
+        });
         addMessage("assistant", lastAnswer || "No answer returned.", {
           mode: data.mode,
           topic: data.topic,
-          source_page: data.source_page
+          source_page: data.source_page,
+          interpreted_query: data.interpreted_query
         });
       } catch (e) {
         removeTyping();
