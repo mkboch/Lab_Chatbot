@@ -381,7 +381,7 @@
         <div class="small">
           <p><a href="https://wang-axis.github.io/" target="_blank" rel="noopener noreferrer">WANG-AXIS Lab Website</a></p>
           <p><a href="https://wang-axis.github.io/datasets/" target="_blank" rel="noopener noreferrer">Lab Datasets Page</a></p>
-          <p><a href="https://mwnafee.github.io/lab-gpu-scheduler-dashboard/" target="_blank" rel="noopener noreferrer">GPU Scheduler Dashboard</a></p>
+          <p><a href="https://mwnafee.github.io/lab-gpu-dashboard/" target="_blank" rel="noopener noreferrer">GPU Scheduler Dashboard</a></p>
           <p><a href="https://mwnafee.github.io/wanglab_phd_roles/" target="_blank" rel="noopener noreferrer">TA/RA Roles Dashboard</a></p>
           <p><a href="https://github.com/WANG-AXIS" target="_blank" rel="noopener noreferrer">WANG-AXIS GitHub</a></p>
         </div>
@@ -390,7 +390,7 @@
   </main>
 
   <script>
-    const API_BASE = "https://file-processor-tim-rules.trycloudflare.com";
+    const API_BASE = "https://hopes-showers-chester-gardening.trycloudflare.com";
     const DEMO_TOKEN = "wangaxis-demo";
 
     const chat = document.getElementById("chat");
@@ -609,7 +609,7 @@
   Source dashboards:
   <a href="https://wang-axis.github.io/datasets/" target="_blank">Datasets</a> |
   <a href="https://github.com/WANG-AXIS" target="_blank">GitHub</a> |
-  <a href="https://mwnafee.github.io/lab-gpu-scheduler-dashboard/" target="_blank">GPU Dashboard</a> |
+  <a href="https://mwnafee.github.io/lab-gpu-dashboard/" target="_blank">GPU Dashboard</a> |
   <a href="https://mwnafee.github.io/wanglab_phd_roles/" target="_blank">TA/RA Roles</a>
 </div>
 
@@ -894,6 +894,177 @@
 })();
 </script>
 
+
+<style id="final-polish-style">
+  .gpu-card-free {
+    border-left: 6px solid #2e7d32 !important;
+    background: #eef8ed !important;
+    border-radius: 14px !important;
+    padding: 12px 14px !important;
+    margin: 10px 0 !important;
+  }
+  .gpu-card-busy {
+    border-left: 6px solid #9b1c1c !important;
+    background: #fff0f0 !important;
+    border-radius: 14px !important;
+    padding: 12px 14px !important;
+    margin: 10px 0 !important;
+  }
+  .gpu-server-title {
+    font-weight: 800 !important;
+    font-size: 18px !important;
+    margin-top: 18px !important;
+    margin-bottom: 8px !important;
+  }
+  .chat-message a, .message a, .answer a {
+    color: #1d4ed8 !important;
+    text-decoration: underline !important;
+    font-weight: 600 !important;
+  }
+</style>
+
+<script id="final-ui-polish-v4">
+(function () {
+  const ALL_LINKS = [
+    ["WANG-AXIS Lab Website", "https://wang-axis.github.io/"],
+    ["Lab Datasets Page", "https://wang-axis.github.io/datasets/"],
+    ["GPU Dashboard", "https://mwnafee.github.io/lab-gpu-dashboard/"],
+    ["WANG-AXIS GitHub", "https://github.com/WANG-AXIS"],
+    ["TA/RA Roles Dashboard", "https://mwnafee.github.io/wanglab_phd_roles/"],
+    ["Lab Chatbot GitHub Page", "https://mkboch.github.io/Lab_Chatbot/"]
+  ];
+
+  function norm(x) {
+    return (x || "").replace(/\s+/g, " ").trim().toLowerCase();
+  }
+
+  function linkifyTextNode(node) {
+    if (!node || node.nodeType !== Node.TEXT_NODE) return;
+    const text = node.nodeValue;
+    if (!text || !/https?:\/\/\S+/.test(text)) return;
+
+    const span = document.createElement("span");
+    span.innerHTML = text.replace(/(https?:\/\/[^\s<]+)/g, function(url) {
+      const clean = url.replace(/[).,;]+$/, "");
+      const trail = url.slice(clean.length);
+      return '<a href="' + clean + '" target="_blank" rel="noopener noreferrer">' + clean + '</a>' + trail;
+    });
+    node.parentNode.replaceChild(span, node);
+  }
+
+  function walkLinkify(root) {
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach(linkifyTextNode);
+  }
+
+  function removeTopicLines() {
+    document.querySelectorAll("*").forEach(function(el) {
+      const t = norm(el.innerText || el.textContent);
+      if (/^topic:\s*(gpu|github|inventory|datasets|overview|roles)$/.test(t)) {
+        el.style.setProperty("display", "none", "important");
+        el.setAttribute("aria-hidden", "true");
+      }
+    });
+  }
+
+  function removePeopleRolesAndFixHeader() {
+    document.querySelectorAll("*").forEach(function(el) {
+      const t = norm(el.innerText || el.textContent);
+      if (
+        t === "people and roles" ||
+        t === "ta assignments" ||
+        t === "manik ra count" ||
+        t.includes("ta assignments") ||
+        t.includes("manik ra count")
+      ) {
+        el.style.setProperty("display", "none", "important");
+        el.setAttribute("aria-hidden", "true");
+      }
+    });
+
+    document.querySelectorAll("p, div, span").forEach(function(el) {
+      if ((el.innerText || "").includes("TA/RA roles")) {
+        el.innerText = el.innerText.replace(", and TA/RA roles", "").replace("or TA/RA roles", "");
+      }
+    });
+  }
+
+  function consolidateGpuButton() {
+    const gpuItems = Array.from(document.querySelectorAll("button, a, [role='button'], div, li"))
+      .filter(el => ["available gpus", "active gpus", "gpu recommendation", "gpu overview"].includes(norm(el.innerText || el.textContent)));
+
+    if (!gpuItems.length) return;
+    const first = gpuItems.find(el => el.tagName === "BUTTON" || el.getAttribute("role") === "button") || gpuItems[0];
+    first.style.removeProperty("display");
+    first.removeAttribute("aria-hidden");
+    first.textContent = "GPU overview";
+    first.setAttribute("data-question", "GPU overview fetch live GPU status from dashboard");
+    first.setAttribute("data-q", "GPU overview fetch live GPU status from dashboard");
+    first.setAttribute("data-prompt", "GPU overview fetch live GPU status from dashboard");
+    gpuItems.forEach(el => { if (el !== first) { el.style.setProperty("display", "none", "important"); }});
+  }
+
+  function addAllReferenceLinks() {
+    const candidates = Array.from(document.querySelectorAll("*")).filter(el => norm(el.innerText || el.textContent) === "reference pages");
+    if (!candidates.length) return;
+
+    const header = candidates[0];
+    let box = header.parentElement;
+    for (let i = 0; box && i < 4; i++) {
+      const text = norm(box.innerText || box.textContent);
+      if (text.includes("wang-axis lab website") || text.includes("lab datasets page")) break;
+      box = box.parentElement;
+    }
+    if (!box) return;
+
+    if (box.dataset.allLinksAdded === "1") return;
+    box.dataset.allLinksAdded = "1";
+
+    const existing = new Set(Array.from(box.querySelectorAll("a")).map(a => a.href));
+    ALL_LINKS.forEach(([label, url]) => {
+      if (existing.has(url)) return;
+      const a = document.createElement("a");
+      a.href = url;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      a.textContent = label;
+      a.style.display = "block";
+      a.style.marginTop = "10px";
+      a.style.color = "#1d4ed8";
+      a.style.fontWeight = "700";
+      box.appendChild(a);
+    });
+  }
+
+  function formatGpuAnswerCards() {
+    document.querySelectorAll("div, p, section, article").forEach(function(el) {
+      const text = el.innerText || "";
+      if (!text.includes("GPU ") || !text.includes("Memory:") || el.dataset.gpuCardsDone === "1") return;
+
+      // This is intentionally conservative. It improves readability only when the whole answer is plain text.
+      if (!text.includes("Lab GPU Dashboard")) return;
+      el.dataset.gpuCardsDone = "1";
+
+      walkLinkify(el);
+    });
+  }
+
+  function run() {
+    removeTopicLines();
+    removePeopleRolesAndFixHeader();
+    consolidateGpuButton();
+    addAllReferenceLinks();
+    walkLinkify(document.body);
+    formatGpuAnswerCards();
+  }
+
+  run();
+  setInterval(run, 700);
+})();
+</script>
+
 </body>
 </html>
 
@@ -906,3 +1077,5 @@
 <!-- sidebar-gpu-cleanup-v2: 2026-05-25T12:28:25.014259+00:00 -->
 
 <!-- final-fix: 2026-05-25T12:40:38.522152+00:00; api=https://file-processor-tim-rules.trycloudflare.com -->
+
+<!-- final-polish-v4: 2026-05-25T12:48:04.871884+00:00; api=https://hopes-showers-chester-gardening.trycloudflare.com -->
