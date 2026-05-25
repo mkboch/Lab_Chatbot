@@ -390,7 +390,7 @@
   </main>
 
   <script>
-    const API_BASE = "https://hopes-showers-chester-gardening.trycloudflare.com";
+    const API_BASE = "https://responsibility-integrated-precipitation-referenced.trycloudflare.com";
     const DEMO_TOKEN = "wangaxis-demo";
 
     const chat = document.getElementById("chat");
@@ -692,209 +692,6 @@
 </script>
 
 
-<script id="wang-axis-sidebar-cleanup-v2">
-(function () {
-  function norm(t) {
-    return (t || "").replace(/\s+/g, " ").trim().toLowerCase();
-  }
-
-  function looksLikeSidebarControl(el) {
-    if (!el) return false;
-    const tag = el.tagName;
-    const cls = el.className || "";
-    const role = el.getAttribute && el.getAttribute("role");
-    return (
-      tag === "BUTTON" ||
-      tag === "A" ||
-      role === "button" ||
-      /tab|nav|sidebar|resource|quick|chip|card|btn|button/i.test(String(cls))
-    );
-  }
-
-  function removePeopleRolesSection() {
-    const headers = Array.from(document.querySelectorAll("*")).filter(el => {
-      const t = norm(el.innerText || el.textContent);
-      return t === "people and roles" || t === "people & roles" || t === "people/roles";
-    });
-
-    headers.forEach(header => {
-      let cur = header;
-      cur.style.display = "none";
-      cur.setAttribute("aria-hidden", "true");
-
-      // Hide following sidebar controls until the next all-caps section header.
-      let next = cur.nextElementSibling;
-      while (next) {
-        const txt = norm(next.innerText || next.textContent);
-        const isNextSection =
-          txt &&
-          txt.length < 40 &&
-          /^[A-Z0-9 &/]+$/.test((next.innerText || next.textContent || "").trim()) &&
-          !txt.includes("ta") &&
-          !txt.includes("ra") &&
-          !txt.includes("role") &&
-          !txt.includes("people");
-
-        if (isNextSection) break;
-
-        const shouldHide =
-          looksLikeSidebarControl(next) ||
-          txt.includes("ta assignment") ||
-          txt.includes("manik ra") ||
-          txt.includes("role") ||
-          txt.includes("people");
-
-        if (shouldHide) {
-          next.style.display = "none";
-          next.setAttribute("aria-hidden", "true");
-        }
-
-        next = next.nextElementSibling;
-      }
-    });
-
-    // Extra safety: hide any remaining sidebar controls related to TA/RA roles.
-    document.querySelectorAll("button, a, [role='button'], .tab, .nav-item, .chip, .quick-card, .example-card").forEach(el => {
-      const t = norm(el.innerText || el.textContent);
-      if (
-        t === "ta assignments" ||
-        t === "manik ra count" ||
-        t.includes("ta assignment") ||
-        t.includes("ra count") ||
-        t.includes("people and roles")
-      ) {
-        el.style.display = "none";
-        el.setAttribute("aria-hidden", "true");
-      }
-    });
-  }
-
-  function consolidateGpuSection() {
-    const gpuButtons = Array.from(document.querySelectorAll("button, a, [role='button'], .tab, .nav-item, .chip, .quick-card, .example-card"))
-      .filter(el => {
-        const t = norm(el.innerText || el.textContent);
-        return t === "available gpus" || t === "active gpus" || t === "gpu recommendation" || t === "gpu overview";
-      });
-
-    if (!gpuButtons.length) return;
-
-    let first = gpuButtons[0];
-
-    // Convert first GPU control into the only GPU overview control.
-    first.style.display = "";
-    first.removeAttribute("aria-hidden");
-    if (first.innerText !== undefined) first.innerText = "GPU overview";
-    if (first.textContent !== undefined) first.textContent = "GPU overview";
-
-    first.setAttribute("data-question", "GPU overview: fetch live GPU status from dashboard");
-    first.setAttribute("data-q", "GPU overview: fetch live GPU status from dashboard");
-    first.setAttribute("data-prompt", "GPU overview: fetch live GPU status from dashboard");
-    first.setAttribute("title", "Fetch live GPU status from the GPU dashboard");
-
-    // Remove any inline role-specific old onclick if it exists.
-    const oldOnClick = first.getAttribute("onclick");
-    if (oldOnClick && /available|active|recommendation|gpu/i.test(oldOnClick)) {
-      first.removeAttribute("onclick");
-    }
-
-    // Hide other GPU controls.
-    gpuButtons.slice(1).forEach(el => {
-      el.style.display = "none";
-      el.setAttribute("aria-hidden", "true");
-    });
-
-    // Capture click and force the right query into the existing chat mechanism.
-    if (!first.dataset.gpuOverviewBound) {
-      first.dataset.gpuOverviewBound = "1";
-      first.addEventListener("click", function (event) {
-        const q = "GPU overview: fetch live GPU status from dashboard";
-        setTimeout(function () {
-          const fields = Array.from(document.querySelectorAll("textarea, input[type='text'], input:not([type])"));
-          const field = fields.find(x => x.offsetParent !== null) || fields[0];
-
-          if (field) {
-            field.value = q;
-            field.dispatchEvent(new Event("input", { bubbles: true }));
-            field.dispatchEvent(new Event("change", { bubbles: true }));
-
-            const askButton = Array.from(document.querySelectorAll("button")).find(b => {
-              const t = norm(b.innerText || b.textContent);
-              return t === "ask" || t === "send" || t === "submit";
-            });
-
-            if (askButton) askButton.click();
-          }
-        }, 80);
-      }, true);
-    }
-  }
-
-  function fixInventoryButtonAgain() {
-    document.querySelectorAll("button, a, [role='button'], .tab, .nav-item, .chip, .quick-card, .example-card").forEach(el => {
-      const t = norm(el.innerText || el.textContent);
-      if (t.includes("inventory")) {
-        el.setAttribute("data-question", "inventory details");
-        el.setAttribute("data-q", "inventory details");
-        el.setAttribute("data-prompt", "inventory details");
-        el.setAttribute("title", "Show lab inventory details");
-      }
-    });
-  }
-
-  function run() {
-    removePeopleRolesSection();
-    consolidateGpuSection();
-    fixInventoryButtonAgain();
-  }
-
-  run();
-  setInterval(run, 750);
-})();
-</script>
-
-
-<script id="final-sidebar-cleanup">
-(function () {
-  function t(el) {
-    return ((el && (el.innerText || el.textContent)) || "").replace(/\s+/g, " ").trim().toLowerCase();
-  }
-  function hide(el) {
-    if (!el) return;
-    el.style.setProperty("display", "none", "important");
-    el.setAttribute("aria-hidden", "true");
-  }
-  function run() {
-    document.querySelectorAll("*").forEach(function(el) {
-      const x = t(el);
-      if (
-        x === "people and roles" ||
-        x === "ta assignments" ||
-        x === "manik ra count" ||
-        x.includes("ta assignments") ||
-        x.includes("manik ra count")
-      ) hide(el);
-    });
-
-    const gpuItems = Array.from(document.querySelectorAll("button, a, [role='button'], div, li"))
-      .filter(el => ["available gpus", "active gpus", "gpu recommendation", "gpu overview"].includes(t(el)));
-
-    if (gpuItems.length) {
-      const first = gpuItems.find(el => el.tagName === "BUTTON" || el.getAttribute("role") === "button") || gpuItems[0];
-      first.style.removeProperty("display");
-      first.removeAttribute("aria-hidden");
-      first.textContent = "GPU overview";
-      first.setAttribute("data-question", "GPU overview fetch live GPU status from dashboard");
-      first.setAttribute("data-q", "GPU overview fetch live GPU status from dashboard");
-      first.setAttribute("data-prompt", "GPU overview fetch live GPU status from dashboard");
-      gpuItems.forEach(el => { if (el !== first) hide(el); });
-    }
-  }
-  run();
-  setInterval(run, 500);
-})();
-</script>
-
-
 <style id="final-polish-style">
   .gpu-card-free {
     border-left: 6px solid #2e7d32 !important;
@@ -923,14 +720,23 @@
   }
 </style>
 
-<script id="final-ui-polish-v4">
+
+<style id="roles-restore-style">
+  .chat-message a, .message a, .answer a {
+    color: #1d4ed8 !important;
+    text-decoration: underline !important;
+    font-weight: 600 !important;
+  }
+</style>
+
+<script id="roles-restore-ui-v1">
 (function () {
-  const ALL_LINKS = [
+  const LINKS = [
     ["WANG-AXIS Lab Website", "https://wang-axis.github.io/"],
     ["Lab Datasets Page", "https://wang-axis.github.io/datasets/"],
     ["GPU Dashboard", "https://mwnafee.github.io/lab-gpu-dashboard/"],
-    ["WANG-AXIS GitHub", "https://github.com/WANG-AXIS"],
     ["TA/RA Roles Dashboard", "https://mwnafee.github.io/wanglab_phd_roles/"],
+    ["WANG-AXIS GitHub", "https://github.com/WANG-AXIS"],
     ["Lab Chatbot GitHub Page", "https://mkboch.github.io/Lab_Chatbot/"]
   ];
 
@@ -938,25 +744,38 @@
     return (x || "").replace(/\s+/g, " ").trim().toLowerCase();
   }
 
-  function linkifyTextNode(node) {
-    if (!node || node.nodeType !== Node.TEXT_NODE) return;
-    const text = node.nodeValue;
-    if (!text || !/https?:\/\/\S+/.test(text)) return;
-
-    const span = document.createElement("span");
-    span.innerHTML = text.replace(/(https?:\/\/[^\s<]+)/g, function(url) {
-      const clean = url.replace(/[).,;]+$/, "");
-      const trail = url.slice(clean.length);
-      return '<a href="' + clean + '" target="_blank" rel="noopener noreferrer">' + clean + '</a>' + trail;
-    });
-    node.parentNode.replaceChild(span, node);
+  function ask(q) {
+    const fields = Array.from(document.querySelectorAll("textarea, input[type='text'], input:not([type])"));
+    const field = fields.find(x => x.offsetParent !== null) || fields[0];
+    if (field) {
+      field.value = q;
+      field.dispatchEvent(new Event("input", { bubbles: true }));
+      field.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+    setTimeout(function () {
+      const btn = Array.from(document.querySelectorAll("button")).find(b => {
+        const t = norm(b.innerText || b.textContent);
+        return t === "ask" || t === "send" || t === "submit";
+      });
+      if (btn) btn.click();
+    }, 120);
   }
 
-  function walkLinkify(root) {
+  function linkify(root) {
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
     const nodes = [];
     while (walker.nextNode()) nodes.push(walker.currentNode);
-    nodes.forEach(linkifyTextNode);
+    nodes.forEach(function(node) {
+      const text = node.nodeValue;
+      if (!text || !/https?:\/\/\S+/.test(text)) return;
+      const span = document.createElement("span");
+      span.innerHTML = text.replace(/(https?:\/\/[^\s<]+)/g, function(url) {
+        const clean = url.replace(/[).,;]+$/, "");
+        const trail = url.slice(clean.length);
+        return '<a href="' + clean + '" target="_blank" rel="noopener noreferrer">' + clean + '</a>' + trail;
+      });
+      node.parentNode.replaceChild(span, node);
+    });
   }
 
   function removeTopicLines() {
@@ -964,67 +783,75 @@
       const t = norm(el.innerText || el.textContent);
       if (/^topic:\s*(gpu|github|inventory|datasets|overview|roles)$/.test(t)) {
         el.style.setProperty("display", "none", "important");
-        el.setAttribute("aria-hidden", "true");
       }
     });
   }
 
-  function removePeopleRolesAndFixHeader() {
-    document.querySelectorAll("*").forEach(function(el) {
-      const t = norm(el.innerText || el.textContent);
-      if (
-        t === "people and roles" ||
-        t === "ta assignments" ||
-        t === "manik ra count" ||
-        t.includes("ta assignments") ||
-        t.includes("manik ra count")
-      ) {
-        el.style.setProperty("display", "none", "important");
-        el.setAttribute("aria-hidden", "true");
-      }
-    });
+  function restoreRolesTab() {
+    const sidebarHeaders = Array.from(document.querySelectorAll("*")).filter(el => norm(el.innerText || el.textContent) === "datasets");
+    if (!sidebarHeaders.length) return;
 
-    document.querySelectorAll("p, div, span").forEach(function(el) {
-      if ((el.innerText || "").includes("TA/RA roles")) {
-        el.innerText = el.innerText.replace(", and TA/RA roles", "").replace("or TA/RA roles", "");
-      }
-    });
+    let sidebar = sidebarHeaders[0].parentElement;
+    for (let i = 0; sidebar && i < 5; i++) {
+      const text = norm(sidebar.innerText || sidebar.textContent);
+      if (text.includes("lab overview") && text.includes("dataset list")) break;
+      sidebar = sidebar.parentElement;
+    }
+    if (!sidebar || sidebar.dataset.rolesRestored === "1") return;
+    sidebar.dataset.rolesRestored = "1";
+
+    const title = document.createElement("div");
+    title.textContent = "PEOPLE AND ROLES";
+    title.style.fontWeight = "800";
+    title.style.fontSize = "12px";
+    title.style.letterSpacing = "0.04em";
+    title.style.color = "#64748b";
+    title.style.margin = "16px 0 8px 0";
+
+    const btn1 = document.createElement("button");
+    btn1.textContent = "TA/RA overview";
+    btn1.style.display = "block";
+    btn1.style.width = "100%";
+    btn1.style.marginBottom = "8px";
+    btn1.style.padding = "12px";
+    btn1.style.borderRadius = "12px";
+    btn1.style.border = "1px solid #e2e8f0";
+    btn1.style.background = "#fff";
+    btn1.style.textAlign = "left";
+    btn1.onclick = function() { ask("tell me about TA/RA roles"); };
+
+    const btn2 = document.createElement("button");
+    btn2.textContent = "Zabirul RA count";
+    btn2.style.display = "block";
+    btn2.style.width = "100%";
+    btn2.style.marginBottom = "8px";
+    btn2.style.padding = "12px";
+    btn2.style.borderRadius = "12px";
+    btn2.style.border = "1px solid #e2e8f0";
+    btn2.style.background = "#fff";
+    btn2.style.textAlign = "left";
+    btn2.onclick = function() { ask("how many RA terms did Zabirul have?"); };
+
+    sidebar.appendChild(title);
+    sidebar.appendChild(btn1);
+    sidebar.appendChild(btn2);
   }
 
-  function consolidateGpuButton() {
-    const gpuItems = Array.from(document.querySelectorAll("button, a, [role='button'], div, li"))
-      .filter(el => ["available gpus", "active gpus", "gpu recommendation", "gpu overview"].includes(norm(el.innerText || el.textContent)));
+  function addLinks() {
+    const headers = Array.from(document.querySelectorAll("*")).filter(el => norm(el.innerText || el.textContent) === "reference pages");
+    if (!headers.length) return;
 
-    if (!gpuItems.length) return;
-    const first = gpuItems.find(el => el.tagName === "BUTTON" || el.getAttribute("role") === "button") || gpuItems[0];
-    first.style.removeProperty("display");
-    first.removeAttribute("aria-hidden");
-    first.textContent = "GPU overview";
-    first.setAttribute("data-question", "GPU overview fetch live GPU status from dashboard");
-    first.setAttribute("data-q", "GPU overview fetch live GPU status from dashboard");
-    first.setAttribute("data-prompt", "GPU overview fetch live GPU status from dashboard");
-    gpuItems.forEach(el => { if (el !== first) { el.style.setProperty("display", "none", "important"); }});
-  }
-
-  function addAllReferenceLinks() {
-    const candidates = Array.from(document.querySelectorAll("*")).filter(el => norm(el.innerText || el.textContent) === "reference pages");
-    if (!candidates.length) return;
-
-    const header = candidates[0];
-    let box = header.parentElement;
+    let box = headers[0].parentElement;
     for (let i = 0; box && i < 4; i++) {
-      const text = norm(box.innerText || box.textContent);
-      if (text.includes("wang-axis lab website") || text.includes("lab datasets page")) break;
+      if ((box.innerText || "").includes("WANG-AXIS Lab Website")) break;
       box = box.parentElement;
     }
-    if (!box) return;
+    if (!box || box.dataset.linksRestored === "1") return;
+    box.dataset.linksRestored = "1";
 
-    if (box.dataset.allLinksAdded === "1") return;
-    box.dataset.allLinksAdded = "1";
-
-    const existing = new Set(Array.from(box.querySelectorAll("a")).map(a => a.href));
-    ALL_LINKS.forEach(([label, url]) => {
-      if (existing.has(url)) return;
+    LINKS.forEach(function(pair) {
+      const label = pair[0], url = pair[1];
+      if (Array.from(box.querySelectorAll("a")).some(a => a.href === url)) return;
       const a = document.createElement("a");
       a.href = url;
       a.target = "_blank";
@@ -1038,30 +865,15 @@
     });
   }
 
-  function formatGpuAnswerCards() {
-    document.querySelectorAll("div, p, section, article").forEach(function(el) {
-      const text = el.innerText || "";
-      if (!text.includes("GPU ") || !text.includes("Memory:") || el.dataset.gpuCardsDone === "1") return;
-
-      // This is intentionally conservative. It improves readability only when the whole answer is plain text.
-      if (!text.includes("Lab GPU Dashboard")) return;
-      el.dataset.gpuCardsDone = "1";
-
-      walkLinkify(el);
-    });
-  }
-
   function run() {
+    restoreRolesTab();
+    addLinks();
     removeTopicLines();
-    removePeopleRolesAndFixHeader();
-    consolidateGpuButton();
-    addAllReferenceLinks();
-    walkLinkify(document.body);
-    formatGpuAnswerCards();
+    linkify(document.body);
   }
 
   run();
-  setInterval(run, 700);
+  setInterval(run, 800);
 })();
 </script>
 
@@ -1079,3 +891,5 @@
 <!-- final-fix: 2026-05-25T12:40:38.522152+00:00; api=https://file-processor-tim-rules.trycloudflare.com -->
 
 <!-- final-polish-v4: 2026-05-25T12:48:04.871884+00:00; api=https://hopes-showers-chester-gardening.trycloudflare.com -->
+
+<!-- restore-roles-v1: 2026-05-25T12:58:26.254492+00:00; api=https://responsibility-integrated-precipitation-referenced.trycloudflare.com -->
