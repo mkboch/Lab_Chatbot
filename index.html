@@ -381,7 +381,7 @@
         <div class="small">
           <p><a href="https://wang-axis.github.io/" target="_blank" rel="noopener noreferrer">WANG-AXIS Lab Website</a></p>
           <p><a href="https://wang-axis.github.io/datasets/" target="_blank" rel="noopener noreferrer">Lab Datasets Page</a></p>
-          <p><a href="https://mwnafee.github.io/lab-gpu-dashboard/" target="_blank" rel="noopener noreferrer">GPU Scheduler Dashboard</a></p>
+          <p><a href="https://mwnafee.github.io/lab-gpu-dashboard/" target="_blank" rel="noopener noreferrer">GPU Dashboard</a></p>
           <p><a href="https://mwnafee.github.io/wanglab_phd_roles/" target="_blank" rel="noopener noreferrer">TA/RA Roles Dashboard</a></p>
           <p><a href="https://github.com/WANG-AXIS" target="_blank" rel="noopener noreferrer">WANG-AXIS GitHub</a></p>
         </div>
@@ -692,27 +692,8 @@
 </script>
 
 
-<style id="final-polish-style">
-  .gpu-card-free {
-    border-left: 6px solid #2e7d32 !important;
-    background: #eef8ed !important;
-    border-radius: 14px !important;
-    padding: 12px 14px !important;
-    margin: 10px 0 !important;
-  }
-  .gpu-card-busy {
-    border-left: 6px solid #9b1c1c !important;
-    background: #fff0f0 !important;
-    border-radius: 14px !important;
-    padding: 12px 14px !important;
-    margin: 10px 0 !important;
-  }
-  .gpu-server-title {
-    font-weight: 800 !important;
-    font-size: 18px !important;
-    margin-top: 18px !important;
-    margin-bottom: 8px !important;
-  }
+
+<style id="roles-clean-generic-style-v2">
   .chat-message a, .message a, .answer a {
     color: #1d4ed8 !important;
     text-decoration: underline !important;
@@ -720,16 +701,7 @@
   }
 </style>
 
-
-<style id="roles-restore-style">
-  .chat-message a, .message a, .answer a {
-    color: #1d4ed8 !important;
-    text-decoration: underline !important;
-    font-weight: 600 !important;
-  }
-</style>
-
-<script id="roles-restore-ui-v1">
+<script id="roles-clean-generic-v2">
 (function () {
   const LINKS = [
     ["WANG-AXIS Lab Website", "https://wang-axis.github.io/"],
@@ -744,14 +716,22 @@
     return (x || "").replace(/\s+/g, " ").trim().toLowerCase();
   }
 
+  function hide(el) {
+    if (!el) return;
+    el.style.setProperty("display", "none", "important");
+    el.setAttribute("aria-hidden", "true");
+  }
+
   function ask(q) {
     const fields = Array.from(document.querySelectorAll("textarea, input[type='text'], input:not([type])"));
     const field = fields.find(x => x.offsetParent !== null) || fields[0];
+
     if (field) {
       field.value = q;
       field.dispatchEvent(new Event("input", { bubbles: true }));
       field.dispatchEvent(new Event("change", { bubbles: true }));
     }
+
     setTimeout(function () {
       const btn = Array.from(document.querySelectorAll("button")).find(b => {
         const t = norm(b.innerText || b.textContent);
@@ -765,9 +745,12 @@
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
     const nodes = [];
     while (walker.nextNode()) nodes.push(walker.currentNode);
+
     nodes.forEach(function(node) {
       const text = node.nodeValue;
       if (!text || !/https?:\/\/\S+/.test(text)) return;
+      if (node.parentElement && node.parentElement.tagName === "A") return;
+
       const span = document.createElement("span");
       span.innerHTML = text.replace(/(https?:\/\/[^\s<]+)/g, function(url) {
         const clean = url.replace(/[).,;]+$/, "");
@@ -782,23 +765,56 @@
     document.querySelectorAll("*").forEach(function(el) {
       const t = norm(el.innerText || el.textContent);
       if (/^topic:\s*(gpu|github|inventory|datasets|overview|roles)$/.test(t)) {
-        el.style.setProperty("display", "none", "important");
+        hide(el);
       }
     });
   }
 
-  function restoreRolesTab() {
-    const sidebarHeaders = Array.from(document.querySelectorAll("*")).filter(el => norm(el.innerText || el.textContent) === "datasets");
-    if (!sidebarHeaders.length) return;
+  function cleanupRoleSidebar() {
+    const roleTexts = [
+      "people and roles",
+      "ta assignments",
+      "manik ra count",
+      "zabirul ra count",
+      "zabir ra count",
+      "ta/ra overview"
+    ];
 
-    let sidebar = sidebarHeaders[0].parentElement;
-    for (let i = 0; sidebar && i < 5; i++) {
-      const text = norm(sidebar.innerText || sidebar.textContent);
-      if (text.includes("lab overview") && text.includes("dataset list")) break;
-      sidebar = sidebar.parentElement;
-    }
-    if (!sidebar || sidebar.dataset.rolesRestored === "1") return;
-    sidebar.dataset.rolesRestored = "1";
+    document.querySelectorAll("button, a, div, li, span, p").forEach(function(el) {
+      const t = norm(el.innerText || el.textContent);
+
+      if (roleTexts.includes(t)) {
+        hide(el);
+      }
+
+      // Remove any named-person role shortcut, but do not remove normal chat answers.
+      if (
+        (t.includes("ra count") || t.includes("ta count")) &&
+        (t.includes("manik") || t.includes("zabir") || t.includes("zabirul") || t.includes("wasif") || t.includes("derik") || t.includes("yuxuan") || t.includes("jason") || t.includes("marshal") || t.includes("hao"))
+      ) {
+        hide(el);
+      }
+    });
+  }
+
+  function findSidebar() {
+    const all = Array.from(document.querySelectorAll("div, aside, nav, section"));
+    return all.find(el => {
+      const t = norm(el.innerText || el.textContent);
+      const rect = el.getBoundingClientRect();
+      return rect.width > 120 && rect.width < 360 &&
+             t.includes("inventory details") &&
+             t.includes("github repositories") &&
+             t.includes("dataset");
+    });
+  }
+
+  function addGenericRoleTab() {
+    const sidebar = findSidebar();
+    if (!sidebar) return;
+
+    if (sidebar.dataset.genericRolesAdded === "1") return;
+    sidebar.dataset.genericRolesAdded = "1";
 
     const title = document.createElement("div");
     title.textContent = "PEOPLE AND ROLES";
@@ -808,50 +824,54 @@
     title.style.color = "#64748b";
     title.style.margin = "16px 0 8px 0";
 
-    const btn1 = document.createElement("button");
-    btn1.textContent = "TA/RA overview";
-    btn1.style.display = "block";
-    btn1.style.width = "100%";
-    btn1.style.marginBottom = "8px";
-    btn1.style.padding = "12px";
-    btn1.style.borderRadius = "12px";
-    btn1.style.border = "1px solid #e2e8f0";
-    btn1.style.background = "#fff";
-    btn1.style.textAlign = "left";
-    btn1.onclick = function() { ask("tell me about TA/RA roles"); };
-
-    const btn2 = document.createElement("button");
-    btn2.textContent = "Zabirul RA count";
-    btn2.style.display = "block";
-    btn2.style.width = "100%";
-    btn2.style.marginBottom = "8px";
-    btn2.style.padding = "12px";
-    btn2.style.borderRadius = "12px";
-    btn2.style.border = "1px solid #e2e8f0";
-    btn2.style.background = "#fff";
-    btn2.style.textAlign = "left";
-    btn2.onclick = function() { ask("how many RA terms did Zabirul have?"); };
+    const btn = document.createElement("button");
+    btn.textContent = "TA/RA roles";
+    btn.style.display = "block";
+    btn.style.width = "100%";
+    btn.style.marginBottom = "8px";
+    btn.style.padding = "12px";
+    btn.style.borderRadius = "12px";
+    btn.style.border = "1px solid #e2e8f0";
+    btn.style.background = "#fff";
+    btn.style.textAlign = "left";
+    btn.style.cursor = "pointer";
+    btn.onclick = function() {
+      ask("tell me about TA/RA roles");
+    };
 
     sidebar.appendChild(title);
-    sidebar.appendChild(btn1);
-    sidebar.appendChild(btn2);
+    sidebar.appendChild(btn);
   }
 
-  function addLinks() {
+  function addAllReferenceLinks() {
     const headers = Array.from(document.querySelectorAll("*")).filter(el => norm(el.innerText || el.textContent) === "reference pages");
     if (!headers.length) return;
 
     let box = headers[0].parentElement;
-    for (let i = 0; box && i < 4; i++) {
-      if ((box.innerText || "").includes("WANG-AXIS Lab Website")) break;
+    for (let i = 0; box && i < 5; i++) {
+      const txt = norm(box.innerText || box.textContent);
+      if (txt.includes("wang-axis lab website") || txt.includes("reference pages")) break;
       box = box.parentElement;
     }
-    if (!box || box.dataset.linksRestored === "1") return;
-    box.dataset.linksRestored = "1";
+    if (!box) return;
+
+    // Fix visible old GPU label if present.
+    Array.from(box.querySelectorAll("a")).forEach(a => {
+      if ((a.textContent || "").toLowerCase().includes("gpu scheduler")) {
+        a.textContent = "GPU Dashboard";
+        a.href = "https://mwnafee.github.io/lab-gpu-dashboard/";
+      }
+    });
+
+    const existing = new Set(Array.from(box.querySelectorAll("a")).map(a => a.href.replace(/\/$/, "")));
 
     LINKS.forEach(function(pair) {
-      const label = pair[0], url = pair[1];
-      if (Array.from(box.querySelectorAll("a")).some(a => a.href === url)) return;
+      const label = pair[0];
+      const url = pair[1];
+      const key = url.replace(/\/$/, "");
+
+      if (existing.has(key)) return;
+
       const a = document.createElement("a");
       a.href = url;
       a.target = "_blank";
@@ -862,13 +882,28 @@
       a.style.color = "#1d4ed8";
       a.style.fontWeight = "700";
       box.appendChild(a);
+      existing.add(key);
+    });
+  }
+
+  function fixGreetingText() {
+    document.querySelectorAll("p, div, span").forEach(function(el) {
+      const txt = el.innerText || "";
+      if (txt.includes("Ask me about lab inventory, datasets, GPUs, GitHub repositories, .")) {
+        el.innerText = txt.replace(
+          "Ask me about lab inventory, datasets, GPUs, GitHub repositories, .",
+          "Ask me about lab inventory, datasets, GPUs, GitHub repositories, and TA/RA roles."
+        );
+      }
     });
   }
 
   function run() {
-    restoreRolesTab();
-    addLinks();
+    cleanupRoleSidebar();
+    addGenericRoleTab();
+    addAllReferenceLinks();
     removeTopicLines();
+    fixGreetingText();
     linkify(document.body);
   }
 
@@ -893,3 +928,5 @@
 <!-- final-polish-v4: 2026-05-25T12:48:04.871884+00:00; api=https://hopes-showers-chester-gardening.trycloudflare.com -->
 
 <!-- restore-roles-v1: 2026-05-25T12:58:26.254492+00:00; api=https://responsibility-integrated-precipitation-referenced.trycloudflare.com -->
+
+<!-- generic-ta-ra-ui-v2: 2026-05-25T13:06:15.306786+00:00 -->
