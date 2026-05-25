@@ -283,7 +283,7 @@
       <button class="nav-btn" data-q="Summarize the lab GitHub repositories.">GitHub repositories</button>
 
       <div class="section-title">GPU Manager</div>
-      <button class="nav-btn" id="gpuDashboardBtn" data-link="https://mwnafee.github.io/lab-gpu-dashboard/">GPU overview</button>
+      <button class="nav-btn" data-q="GPU overview">GPU overview</button>
 
       <div class="section-title">Datasets</div>
       <button class="nav-btn" data-q="List all lab datasets with names and sizes.">Dataset list</button>
@@ -327,7 +327,7 @@
   </div>
 
 <script>
-const API_BASE = "https://training-nutten-llp-inform.trycloudflare.com";
+const API_BASE = "https://payments-while-murphy-opportunities.trycloudflare.com";
 const TOKEN = "wangaxis-demo";
 
 const chat = document.getElementById("chat");
@@ -460,14 +460,7 @@ qInput.addEventListener("keydown", e => {
 });
 
 document.querySelectorAll(".nav-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    if (btn.id === "gpuDashboardBtn") {
-      window.open("https://mwnafee.github.io/lab-gpu-dashboard/", "_blank", "noopener,noreferrer");
-      addMessage("assistant", "I opened the live GPU Dashboard in a new tab. The dashboard is password-protected, so the chatbot should not display stale cached GPU data here. Please use the live dashboard for current GPU availability.", "gpu");
-      return;
-    }
-    ask(btn.dataset.q);
-  });
+  btn.addEventListener("click", () => ask(btn.dataset.q));
 });
 
 document.getElementById("copy").onclick = async () => {
