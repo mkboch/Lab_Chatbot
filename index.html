@@ -390,7 +390,7 @@
   </main>
 
   <script>
-    const API_BASE = "https://component-source-justify-headed.trycloudflare.com";
+    const API_BASE = "https://file-processor-tim-rules.trycloudflare.com";
     const DEMO_TOKEN = "wangaxis-demo";
 
     const chat = document.getElementById("chat");
@@ -852,6 +852,48 @@
 })();
 </script>
 
+
+<script id="final-sidebar-cleanup">
+(function () {
+  function t(el) {
+    return ((el && (el.innerText || el.textContent)) || "").replace(/\s+/g, " ").trim().toLowerCase();
+  }
+  function hide(el) {
+    if (!el) return;
+    el.style.setProperty("display", "none", "important");
+    el.setAttribute("aria-hidden", "true");
+  }
+  function run() {
+    document.querySelectorAll("*").forEach(function(el) {
+      const x = t(el);
+      if (
+        x === "people and roles" ||
+        x === "ta assignments" ||
+        x === "manik ra count" ||
+        x.includes("ta assignments") ||
+        x.includes("manik ra count")
+      ) hide(el);
+    });
+
+    const gpuItems = Array.from(document.querySelectorAll("button, a, [role='button'], div, li"))
+      .filter(el => ["available gpus", "active gpus", "gpu recommendation", "gpu overview"].includes(t(el)));
+
+    if (gpuItems.length) {
+      const first = gpuItems.find(el => el.tagName === "BUTTON" || el.getAttribute("role") === "button") || gpuItems[0];
+      first.style.removeProperty("display");
+      first.removeAttribute("aria-hidden");
+      first.textContent = "GPU overview";
+      first.setAttribute("data-question", "GPU overview fetch live GPU status from dashboard");
+      first.setAttribute("data-q", "GPU overview fetch live GPU status from dashboard");
+      first.setAttribute("data-prompt", "GPU overview fetch live GPU status from dashboard");
+      gpuItems.forEach(el => { if (el !== first) hide(el); });
+    }
+  }
+  run();
+  setInterval(run, 500);
+})();
+</script>
+
 </body>
 </html>
 
@@ -862,3 +904,5 @@
 <!-- quick-tunnel-api: 2026-05-25T12:25:07.714323+00:00; api=https://component-source-justify-headed.trycloudflare.com -->
 
 <!-- sidebar-gpu-cleanup-v2: 2026-05-25T12:28:25.014259+00:00 -->
+
+<!-- final-fix: 2026-05-25T12:40:38.522152+00:00; api=https://file-processor-tim-rules.trycloudflare.com -->
