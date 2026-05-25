@@ -693,15 +693,40 @@
 
 
 
-<style id="roles-clean-generic-style-v2">
-  .chat-message a, .message a, .answer a {
+
+<style id="final-clean-ui-style-v5">
+  .final-clean-hidden {
+    display: none !important;
+  }
+  .final-clean-sidebar-title {
+    font-weight: 800 !important;
+    font-size: 12px !important;
+    letter-spacing: 0.04em !important;
+    color: #64748b !important;
+    margin: 16px 0 8px 0 !important;
+    text-transform: uppercase !important;
+  }
+  .final-clean-sidebar-btn {
+    display: block !important;
+    width: 100% !important;
+    margin-bottom: 8px !important;
+    padding: 12px !important;
+    border-radius: 12px !important;
+    border: 1px solid #e2e8f0 !important;
+    background: #fff !important;
+    text-align: left !important;
+    cursor: pointer !important;
+    font-weight: 600 !important;
+    color: #0f172a !important;
+  }
+  .chat-message a, .message a, .answer a, #final-clean-reference-links a {
     color: #1d4ed8 !important;
     text-decoration: underline !important;
-    font-weight: 600 !important;
+    font-weight: 700 !important;
   }
 </style>
 
-<script id="roles-clean-generic-v2">
+<script id="final-clean-ui-v5">
 (function () {
   const LINKS = [
     ["WANG-AXIS Lab Website", "https://wang-axis.github.io/"],
@@ -718,8 +743,16 @@
 
   function hide(el) {
     if (!el) return;
-    el.style.setProperty("display", "none", "important");
+    if (el.id && el.id.startsWith("final-clean-")) return;
+    el.classList.add("final-clean-hidden");
     el.setAttribute("aria-hidden", "true");
+  }
+
+  function show(el) {
+    if (!el) return;
+    el.classList.remove("final-clean-hidden");
+    el.style.removeProperty("display");
+    el.removeAttribute("aria-hidden");
   }
 
   function ask(q) {
@@ -741,12 +774,172 @@
     }, 120);
   }
 
+  function getSidebar() {
+    const candidates = Array.from(document.querySelectorAll("aside, nav, section, div"));
+    let best = null;
+    let bestScore = -1;
+
+    candidates.forEach(el => {
+      const rect = el.getBoundingClientRect();
+      const t = norm(el.innerText || el.textContent);
+      if (rect.width < 120 || rect.width > 380) return;
+      if (rect.left > 400) return;
+
+      let score = 0;
+      if (t.includes("inventory details")) score += 3;
+      if (t.includes("github repositories")) score += 3;
+      if (t.includes("dataset list")) score += 3;
+      if (t.includes("gpu manager")) score += 2;
+      if (t.includes("resources")) score += 1;
+
+      if (score > bestScore) {
+        best = el;
+        bestScore = score;
+      }
+    });
+
+    return best;
+  }
+
+  function cleanGpuSidebar() {
+    const gpuLabels = ["available gpus", "active gpus", "gpu recommendation", "gpu overview"];
+
+    const controls = Array.from(document.querySelectorAll("button, a, [role='button'], div, li"))
+      .filter(el => gpuLabels.includes(norm(el.innerText || el.textContent)));
+
+    if (!controls.length) return;
+
+    let keep = controls.find(el => norm(el.innerText || el.textContent) === "available gpus") || controls[0];
+
+    controls.forEach(el => {
+      if (el === keep) return;
+      hide(el);
+    });
+
+    show(keep);
+    keep.textContent = "GPU overview";
+    keep.setAttribute("data-question", "GPU overview fetch live GPU status from dashboard");
+    keep.setAttribute("data-q", "GPU overview fetch live GPU status from dashboard");
+    keep.setAttribute("data-prompt", "GPU overview fetch live GPU status from dashboard");
+    keep.onclick = function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      ask("GPU overview fetch live GPU status from dashboard");
+    };
+  }
+
+  function cleanRoleSidebar() {
+    document.querySelectorAll("button, a, [role='button'], div, li, span, p").forEach(el => {
+      if (el.id && el.id.startsWith("final-clean-")) return;
+
+      const t = norm(el.innerText || el.textContent);
+
+      const isOldRole =
+        t === "people and roles" ||
+        t === "ta assignments" ||
+        t === "manik ra count" ||
+        t === "zabirul ra count" ||
+        t === "zabir ra count" ||
+        t === "ta/ra overview" ||
+        t.includes("manik ra count") ||
+        t.includes("zabirul ra count") ||
+        t.includes("ta assignments");
+
+      if (isOldRole) hide(el);
+    });
+
+    const sidebar = getSidebar();
+    if (!sidebar) return;
+
+    let existing = document.getElementById("final-clean-roles-section");
+    if (!existing) {
+      existing = document.createElement("div");
+      existing.id = "final-clean-roles-section";
+
+      const title = document.createElement("div");
+      title.id = "final-clean-roles-title";
+      title.className = "final-clean-sidebar-title";
+      title.textContent = "People and Roles";
+
+      const btn = document.createElement("button");
+      btn.id = "final-clean-roles-button";
+      btn.className = "final-clean-sidebar-btn";
+      btn.textContent = "TA/RA roles";
+      btn.onclick = function () {
+        ask("tell me about TA/RA roles");
+      };
+
+      existing.appendChild(title);
+      existing.appendChild(btn);
+      sidebar.appendChild(existing);
+    }
+
+    show(existing);
+  }
+
+  function addReferenceLinks() {
+    const headers = Array.from(document.querySelectorAll("*"))
+      .filter(el => norm(el.innerText || el.textContent) === "reference pages");
+
+    if (!headers.length) return;
+
+    let box = headers[0].parentElement;
+    for (let i = 0; box && i < 5; i++) {
+      const t = norm(box.innerText || box.textContent);
+      if (t.includes("wang-axis lab website") || t.includes("reference pages")) break;
+      box = box.parentElement;
+    }
+    if (!box) return;
+
+    // Correct old GPU link if present.
+    Array.from(box.querySelectorAll("a")).forEach(a => {
+      const label = norm(a.textContent || "");
+      if (label.includes("gpu scheduler")) {
+        a.textContent = "GPU Dashboard";
+        a.href = "https://mwnafee.github.io/lab-gpu-dashboard/";
+      }
+    });
+
+    let container = document.getElementById("final-clean-reference-links");
+    if (!container) {
+      container = document.createElement("div");
+      container.id = "final-clean-reference-links";
+      box.appendChild(container);
+    }
+
+    const existing = new Set(Array.from(box.querySelectorAll("a")).map(a => a.href.replace(/\/$/, "")));
+
+    LINKS.forEach(([label, url]) => {
+      const key = url.replace(/\/$/, "");
+      if (existing.has(key)) return;
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      a.textContent = label;
+      a.style.display = "block";
+      a.style.marginTop = "10px";
+      container.appendChild(a);
+      existing.add(key);
+    });
+  }
+
+  function removeTopicLines() {
+    document.querySelectorAll("*").forEach(el => {
+      const t = norm(el.innerText || el.textContent);
+      if (/^topic:\s*(gpu|github|inventory|datasets|overview|roles)$/.test(t)) {
+        hide(el);
+      }
+    });
+  }
+
   function linkify(root) {
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
     const nodes = [];
     while (walker.nextNode()) nodes.push(walker.currentNode);
 
-    nodes.forEach(function(node) {
+    nodes.forEach(node => {
       const text = node.nodeValue;
       if (!text || !/https?:\/\/\S+/.test(text)) return;
       if (node.parentElement && node.parentElement.tagName === "A") return;
@@ -757,137 +950,13 @@
         const trail = url.slice(clean.length);
         return '<a href="' + clean + '" target="_blank" rel="noopener noreferrer">' + clean + '</a>' + trail;
       });
+
       node.parentNode.replaceChild(span, node);
     });
   }
 
-  function removeTopicLines() {
-    document.querySelectorAll("*").forEach(function(el) {
-      const t = norm(el.innerText || el.textContent);
-      if (/^topic:\s*(gpu|github|inventory|datasets|overview|roles)$/.test(t)) {
-        hide(el);
-      }
-    });
-  }
-
-  function cleanupRoleSidebar() {
-    const roleTexts = [
-      "people and roles",
-      "ta assignments",
-      "manik ra count",
-      "zabirul ra count",
-      "zabir ra count",
-      "ta/ra overview"
-    ];
-
-    document.querySelectorAll("button, a, div, li, span, p").forEach(function(el) {
-      const t = norm(el.innerText || el.textContent);
-
-      if (roleTexts.includes(t)) {
-        hide(el);
-      }
-
-      // Remove any named-person role shortcut, but do not remove normal chat answers.
-      if (
-        (t.includes("ra count") || t.includes("ta count")) &&
-        (t.includes("manik") || t.includes("zabir") || t.includes("zabirul") || t.includes("wasif") || t.includes("derik") || t.includes("yuxuan") || t.includes("jason") || t.includes("marshal") || t.includes("hao"))
-      ) {
-        hide(el);
-      }
-    });
-  }
-
-  function findSidebar() {
-    const all = Array.from(document.querySelectorAll("div, aside, nav, section"));
-    return all.find(el => {
-      const t = norm(el.innerText || el.textContent);
-      const rect = el.getBoundingClientRect();
-      return rect.width > 120 && rect.width < 360 &&
-             t.includes("inventory details") &&
-             t.includes("github repositories") &&
-             t.includes("dataset");
-    });
-  }
-
-  function addGenericRoleTab() {
-    const sidebar = findSidebar();
-    if (!sidebar) return;
-
-    if (sidebar.dataset.genericRolesAdded === "1") return;
-    sidebar.dataset.genericRolesAdded = "1";
-
-    const title = document.createElement("div");
-    title.textContent = "PEOPLE AND ROLES";
-    title.style.fontWeight = "800";
-    title.style.fontSize = "12px";
-    title.style.letterSpacing = "0.04em";
-    title.style.color = "#64748b";
-    title.style.margin = "16px 0 8px 0";
-
-    const btn = document.createElement("button");
-    btn.textContent = "TA/RA roles";
-    btn.style.display = "block";
-    btn.style.width = "100%";
-    btn.style.marginBottom = "8px";
-    btn.style.padding = "12px";
-    btn.style.borderRadius = "12px";
-    btn.style.border = "1px solid #e2e8f0";
-    btn.style.background = "#fff";
-    btn.style.textAlign = "left";
-    btn.style.cursor = "pointer";
-    btn.onclick = function() {
-      ask("tell me about TA/RA roles");
-    };
-
-    sidebar.appendChild(title);
-    sidebar.appendChild(btn);
-  }
-
-  function addAllReferenceLinks() {
-    const headers = Array.from(document.querySelectorAll("*")).filter(el => norm(el.innerText || el.textContent) === "reference pages");
-    if (!headers.length) return;
-
-    let box = headers[0].parentElement;
-    for (let i = 0; box && i < 5; i++) {
-      const txt = norm(box.innerText || box.textContent);
-      if (txt.includes("wang-axis lab website") || txt.includes("reference pages")) break;
-      box = box.parentElement;
-    }
-    if (!box) return;
-
-    // Fix visible old GPU label if present.
-    Array.from(box.querySelectorAll("a")).forEach(a => {
-      if ((a.textContent || "").toLowerCase().includes("gpu scheduler")) {
-        a.textContent = "GPU Dashboard";
-        a.href = "https://mwnafee.github.io/lab-gpu-dashboard/";
-      }
-    });
-
-    const existing = new Set(Array.from(box.querySelectorAll("a")).map(a => a.href.replace(/\/$/, "")));
-
-    LINKS.forEach(function(pair) {
-      const label = pair[0];
-      const url = pair[1];
-      const key = url.replace(/\/$/, "");
-
-      if (existing.has(key)) return;
-
-      const a = document.createElement("a");
-      a.href = url;
-      a.target = "_blank";
-      a.rel = "noopener noreferrer";
-      a.textContent = label;
-      a.style.display = "block";
-      a.style.marginTop = "10px";
-      a.style.color = "#1d4ed8";
-      a.style.fontWeight = "700";
-      box.appendChild(a);
-      existing.add(key);
-    });
-  }
-
-  function fixGreetingText() {
-    document.querySelectorAll("p, div, span").forEach(function(el) {
+  function fixGreeting() {
+    document.querySelectorAll("p, div, span").forEach(el => {
       const txt = el.innerText || "";
       if (txt.includes("Ask me about lab inventory, datasets, GPUs, GitHub repositories, .")) {
         el.innerText = txt.replace(
@@ -899,16 +968,16 @@
   }
 
   function run() {
-    cleanupRoleSidebar();
-    addGenericRoleTab();
-    addAllReferenceLinks();
+    cleanGpuSidebar();
+    cleanRoleSidebar();
+    addReferenceLinks();
     removeTopicLines();
-    fixGreetingText();
+    fixGreeting();
     linkify(document.body);
   }
 
   run();
-  setInterval(run, 800);
+  setInterval(run, 500);
 })();
 </script>
 
@@ -930,3 +999,5 @@
 <!-- restore-roles-v1: 2026-05-25T12:58:26.254492+00:00; api=https://responsibility-integrated-precipitation-referenced.trycloudflare.com -->
 
 <!-- generic-ta-ra-ui-v2: 2026-05-25T13:06:15.306786+00:00 -->
+
+<!-- final-clean-ui-v5: 2026-05-25T13:10:20.320050+00:00 -->
