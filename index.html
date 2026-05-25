@@ -203,6 +203,67 @@
       aside.right { display: none; }
     }
   </style>
+
+<style id="scroll-fix-v1">
+  html, body {
+    height: 100% !important;
+    min-height: 100% !important;
+  }
+
+  body {
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+  }
+
+  header {
+    flex: 0 0 auto !important;
+  }
+
+  .layout {
+    flex: 1 1 auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  aside.left,
+  aside.right {
+    height: 100% !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+  }
+
+  main {
+    height: 100% !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  #chat {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    scroll-behavior: smooth !important;
+    padding-bottom: 24px !important;
+  }
+
+  .composer {
+    flex: 0 0 auto !important;
+    position: sticky !important;
+    bottom: 0 !important;
+    z-index: 5 !important;
+  }
+
+  .msg {
+    overflow-wrap: anywhere !important;
+    word-break: normal !important;
+  }
+</style>
+
 </head>
 
 <body>
@@ -413,3 +474,5 @@ setInterval(checkHealth, 30000);
 </script>
 </body>
 </html>
+
+<!-- scroll-fix-v1: 2026-05-25T13:28:10.122545+00:00 -->
