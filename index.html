@@ -613,7 +613,87 @@
   <a href="https://mwnafee.github.io/wanglab_phd_roles/" target="_blank">TA/RA Roles</a>
 </div>
 
+
+<script id="wang-axis-feedback-patch">
+(function () {
+  function textOf(el) {
+    return (el && (el.innerText || el.textContent || "") || "").trim().toLowerCase();
+  }
+
+  function hidePeopleAndRoleTabs() {
+    const roleWords = ["people", "person", "persons", "role", "roles", "ta/ra", "ta-ra", "ta ra", "phd roles"];
+    document.querySelectorAll("button, a, [role='button'], .tab, .nav-item, .chip, .quick-card, .example-card").forEach(function (el) {
+      const t = textOf(el);
+      if (!t) return;
+
+      // Keep normal chat answers visible; only hide UI controls/cards.
+      const looksLikeControl =
+        el.tagName === "BUTTON" ||
+        el.tagName === "A" ||
+        el.getAttribute("role") === "button" ||
+        /tab|nav|chip|quick|card|btn|button/i.test(el.className || "");
+
+      if (looksLikeControl && roleWords.some(w => t === w || t.includes(w))) {
+        el.style.display = "none";
+        el.setAttribute("aria-hidden", "true");
+      }
+    });
+  }
+
+  function fixInventoryControls() {
+    document.querySelectorAll("button, a, [role='button'], .tab, .nav-item, .chip, .quick-card, .example-card").forEach(function (el) {
+      const t = textOf(el);
+      if (!t.includes("inventory")) return;
+
+      ["data-question", "data-q", "data-prompt", "data-message", "data-query", "aria-label", "title"].forEach(function (attr) {
+        const v = el.getAttribute(attr);
+        if (v && /ta|ra|role|people/i.test(v)) {
+          el.setAttribute(attr, "tell me inventory details");
+        }
+      });
+
+      const oc = el.getAttribute("onclick");
+      if (oc && /ta|ra|role|people/i.test(oc)) {
+        el.setAttribute("onclick", oc.replace(/[^'"]*(ta|ra|role|people)[^'"]*/ig, "tell me inventory details"));
+      }
+    });
+  }
+
+  function interceptInventoryClicks() {
+    document.addEventListener("click", function (event) {
+      const el = event.target.closest("button, a, [role='button'], .tab, .nav-item, .chip, .quick-card, .example-card");
+      if (!el) return;
+
+      const t = textOf(el);
+      if (!t.includes("inventory")) return;
+
+      setTimeout(function () {
+        const fields = Array.from(document.querySelectorAll("textarea, input[type='text'], input:not([type])"));
+        fields.forEach(function (field) {
+          if (/ta|ra|role|people/i.test(field.value || "")) {
+            field.value = "tell me inventory details";
+            field.dispatchEvent(new Event("input", { bubbles: true }));
+            field.dispatchEvent(new Event("change", { bubbles: true }));
+          }
+        });
+      }, 50);
+    }, true);
+  }
+
+  function runPatch() {
+    hidePeopleAndRoleTabs();
+    fixInventoryControls();
+  }
+
+  runPatch();
+  interceptInventoryClicks();
+  setInterval(runPatch, 1000);
+})();
+</script>
+
 </body>
 </html>
 
 <!-- github-lab-chatbot-live: 2026-05-25T12:05:52.489187+00:00; api=https://deployment-what-surprised-tomatoes.trycloudflare.com -->
+
+<!-- wang-axis-feedback-fix: 2026-05-25T12:16:23.542364+00:00; hide people/roles; dynamic gpu backend; inventory tab fix -->
