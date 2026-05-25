@@ -691,6 +691,167 @@
 })();
 </script>
 
+
+<script id="wang-axis-sidebar-cleanup-v2">
+(function () {
+  function norm(t) {
+    return (t || "").replace(/\s+/g, " ").trim().toLowerCase();
+  }
+
+  function looksLikeSidebarControl(el) {
+    if (!el) return false;
+    const tag = el.tagName;
+    const cls = el.className || "";
+    const role = el.getAttribute && el.getAttribute("role");
+    return (
+      tag === "BUTTON" ||
+      tag === "A" ||
+      role === "button" ||
+      /tab|nav|sidebar|resource|quick|chip|card|btn|button/i.test(String(cls))
+    );
+  }
+
+  function removePeopleRolesSection() {
+    const headers = Array.from(document.querySelectorAll("*")).filter(el => {
+      const t = norm(el.innerText || el.textContent);
+      return t === "people and roles" || t === "people & roles" || t === "people/roles";
+    });
+
+    headers.forEach(header => {
+      let cur = header;
+      cur.style.display = "none";
+      cur.setAttribute("aria-hidden", "true");
+
+      // Hide following sidebar controls until the next all-caps section header.
+      let next = cur.nextElementSibling;
+      while (next) {
+        const txt = norm(next.innerText || next.textContent);
+        const isNextSection =
+          txt &&
+          txt.length < 40 &&
+          /^[A-Z0-9 &/]+$/.test((next.innerText || next.textContent || "").trim()) &&
+          !txt.includes("ta") &&
+          !txt.includes("ra") &&
+          !txt.includes("role") &&
+          !txt.includes("people");
+
+        if (isNextSection) break;
+
+        const shouldHide =
+          looksLikeSidebarControl(next) ||
+          txt.includes("ta assignment") ||
+          txt.includes("manik ra") ||
+          txt.includes("role") ||
+          txt.includes("people");
+
+        if (shouldHide) {
+          next.style.display = "none";
+          next.setAttribute("aria-hidden", "true");
+        }
+
+        next = next.nextElementSibling;
+      }
+    });
+
+    // Extra safety: hide any remaining sidebar controls related to TA/RA roles.
+    document.querySelectorAll("button, a, [role='button'], .tab, .nav-item, .chip, .quick-card, .example-card").forEach(el => {
+      const t = norm(el.innerText || el.textContent);
+      if (
+        t === "ta assignments" ||
+        t === "manik ra count" ||
+        t.includes("ta assignment") ||
+        t.includes("ra count") ||
+        t.includes("people and roles")
+      ) {
+        el.style.display = "none";
+        el.setAttribute("aria-hidden", "true");
+      }
+    });
+  }
+
+  function consolidateGpuSection() {
+    const gpuButtons = Array.from(document.querySelectorAll("button, a, [role='button'], .tab, .nav-item, .chip, .quick-card, .example-card"))
+      .filter(el => {
+        const t = norm(el.innerText || el.textContent);
+        return t === "available gpus" || t === "active gpus" || t === "gpu recommendation" || t === "gpu overview";
+      });
+
+    if (!gpuButtons.length) return;
+
+    let first = gpuButtons[0];
+
+    // Convert first GPU control into the only GPU overview control.
+    first.style.display = "";
+    first.removeAttribute("aria-hidden");
+    if (first.innerText !== undefined) first.innerText = "GPU overview";
+    if (first.textContent !== undefined) first.textContent = "GPU overview";
+
+    first.setAttribute("data-question", "GPU overview: fetch live GPU status from dashboard");
+    first.setAttribute("data-q", "GPU overview: fetch live GPU status from dashboard");
+    first.setAttribute("data-prompt", "GPU overview: fetch live GPU status from dashboard");
+    first.setAttribute("title", "Fetch live GPU status from the GPU dashboard");
+
+    // Remove any inline role-specific old onclick if it exists.
+    const oldOnClick = first.getAttribute("onclick");
+    if (oldOnClick && /available|active|recommendation|gpu/i.test(oldOnClick)) {
+      first.removeAttribute("onclick");
+    }
+
+    // Hide other GPU controls.
+    gpuButtons.slice(1).forEach(el => {
+      el.style.display = "none";
+      el.setAttribute("aria-hidden", "true");
+    });
+
+    // Capture click and force the right query into the existing chat mechanism.
+    if (!first.dataset.gpuOverviewBound) {
+      first.dataset.gpuOverviewBound = "1";
+      first.addEventListener("click", function (event) {
+        const q = "GPU overview: fetch live GPU status from dashboard";
+        setTimeout(function () {
+          const fields = Array.from(document.querySelectorAll("textarea, input[type='text'], input:not([type])"));
+          const field = fields.find(x => x.offsetParent !== null) || fields[0];
+
+          if (field) {
+            field.value = q;
+            field.dispatchEvent(new Event("input", { bubbles: true }));
+            field.dispatchEvent(new Event("change", { bubbles: true }));
+
+            const askButton = Array.from(document.querySelectorAll("button")).find(b => {
+              const t = norm(b.innerText || b.textContent);
+              return t === "ask" || t === "send" || t === "submit";
+            });
+
+            if (askButton) askButton.click();
+          }
+        }, 80);
+      }, true);
+    }
+  }
+
+  function fixInventoryButtonAgain() {
+    document.querySelectorAll("button, a, [role='button'], .tab, .nav-item, .chip, .quick-card, .example-card").forEach(el => {
+      const t = norm(el.innerText || el.textContent);
+      if (t.includes("inventory")) {
+        el.setAttribute("data-question", "inventory details");
+        el.setAttribute("data-q", "inventory details");
+        el.setAttribute("data-prompt", "inventory details");
+        el.setAttribute("title", "Show lab inventory details");
+      }
+    });
+  }
+
+  function run() {
+    removePeopleRolesSection();
+    consolidateGpuSection();
+    fixInventoryButtonAgain();
+  }
+
+  run();
+  setInterval(run, 750);
+})();
+</script>
+
 </body>
 </html>
 
@@ -699,3 +860,5 @@
 <!-- wang-axis-feedback-fix: 2026-05-25T12:16:23.542364+00:00; hide people/roles; dynamic gpu backend; inventory tab fix -->
 
 <!-- quick-tunnel-api: 2026-05-25T12:25:07.714323+00:00; api=https://component-source-justify-headed.trycloudflare.com -->
+
+<!-- sidebar-gpu-cleanup-v2: 2026-05-25T12:28:25.014259+00:00 -->
