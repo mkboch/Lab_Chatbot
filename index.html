@@ -696,11 +696,10 @@
 
 
 
-<style id="final-clean-ui-style-v6">
-  .final-clean-hidden {
-    display: none !important;
-  }
-  .final-clean-sidebar-title {
+
+<style id="lab-chatbot-clean-ui-v7-style">
+  .lab-clean-hidden { display: none !important; }
+  .lab-clean-title {
     font-weight: 800 !important;
     font-size: 12px !important;
     letter-spacing: 0.04em !important;
@@ -708,7 +707,7 @@
     margin: 16px 0 8px 0 !important;
     text-transform: uppercase !important;
   }
-  .final-clean-sidebar-btn {
+  .lab-clean-btn {
     display: block !important;
     width: 100% !important;
     margin-bottom: 8px !important;
@@ -721,20 +720,17 @@
     font-weight: 600 !important;
     color: #0f172a !important;
   }
-  .final-source-links {
-    margin-top: 12px !important;
-    padding-top: 10px !important;
-    border-top: 1px solid #e5e7eb !important;
-    font-size: 13px !important;
-  }
-  .chat-message a, .message a, .answer a, #final-clean-reference-links a, .final-source-links a {
+  #lab-clean-reference-links a,
+  .chat-message a,
+  .message a,
+  .answer a {
     color: #1d4ed8 !important;
     text-decoration: underline !important;
     font-weight: 700 !important;
   }
 </style>
 
-<script id="final-clean-ui-v6">
+<script id="lab-chatbot-clean-ui-v7">
 (function () {
   const LINKS = [
     ["WANG-AXIS Lab Website", "https://wang-axis.github.io/"],
@@ -751,37 +747,35 @@
 
   function hide(el) {
     if (!el) return;
-    if (el.id && el.id.startsWith("final-clean-")) return;
-    el.classList.add("final-clean-hidden");
+    if (el.id && el.id.startsWith("lab-clean")) return;
+    el.classList.add("lab-clean-hidden");
     el.setAttribute("aria-hidden", "true");
   }
 
   function show(el) {
     if (!el) return;
-    el.classList.remove("final-clean-hidden");
+    el.classList.remove("lab-clean-hidden");
     el.style.removeProperty("display");
     el.removeAttribute("aria-hidden");
   }
 
-  function getInputField() {
+  function inputBox() {
     const fields = Array.from(document.querySelectorAll("textarea, input[type='text'], input:not([type])"));
     return fields.find(x => x.offsetParent !== null) || fields[0];
   }
 
-  function clearInputSoon() {
+  function clearInput() {
     setTimeout(function () {
-      const field = getInputField();
-      if (field) {
-        field.value = "";
-        field.dispatchEvent(new Event("input", { bubbles: true }));
-        field.dispatchEvent(new Event("change", { bubbles: true }));
-      }
+      const field = inputBox();
+      if (!field) return;
+      field.value = "";
+      field.dispatchEvent(new Event("input", { bubbles: true }));
+      field.dispatchEvent(new Event("change", { bubbles: true }));
     }, 700);
   }
 
   function ask(q) {
-    const field = getInputField();
-
+    const field = inputBox();
     if (field) {
       field.value = q;
       field.dispatchEvent(new Event("input", { bubbles: true }));
@@ -789,25 +783,24 @@
     }
 
     setTimeout(function () {
-      const btn = Array.from(document.querySelectorAll("button")).find(b => {
+      const askBtn = Array.from(document.querySelectorAll("button")).find(b => {
         const t = norm(b.innerText || b.textContent);
         return t === "ask" || t === "send" || t === "submit";
       });
-      if (btn) btn.click();
-      clearInputSoon();
+      if (askBtn) askBtn.click();
+      clearInput();
     }, 120);
   }
 
-  function getSidebar() {
+  function sidebar() {
     const candidates = Array.from(document.querySelectorAll("aside, nav, section, div"));
     let best = null;
-    let bestScore = -1;
+    let scoreBest = -1;
 
     candidates.forEach(el => {
-      const rect = el.getBoundingClientRect();
+      const r = el.getBoundingClientRect();
       const t = norm(el.innerText || el.textContent);
-      if (rect.width < 120 || rect.width > 380) return;
-      if (rect.left > 420) return;
+      if (r.left > 420 || r.width < 120 || r.width > 390) return;
 
       let score = 0;
       if (t.includes("inventory details")) score += 3;
@@ -816,24 +809,23 @@
       if (t.includes("gpu manager")) score += 2;
       if (t.includes("resources")) score += 1;
 
-      if (score > bestScore) {
+      if (score > scoreBest) {
         best = el;
-        bestScore = score;
+        scoreBest = score;
       }
     });
 
     return best;
   }
 
-  function cleanGpuSidebar() {
-    const gpuLabels = ["available gpus", "active gpus", "gpu recommendation", "gpu overview"];
-
+  function cleanGpuButtons() {
+    const labels = ["available gpus", "active gpus", "gpu recommendation", "gpu overview"];
     const controls = Array.from(document.querySelectorAll("button, a, [role='button'], div, li"))
-      .filter(el => gpuLabels.includes(norm(el.innerText || el.textContent)));
+      .filter(el => labels.includes(norm(el.innerText || el.textContent)));
 
     if (!controls.length) return;
 
-    let keep = controls.find(el => norm(el.innerText || el.textContent) === "available gpus") || controls[0];
+    const keep = controls.find(el => norm(el.innerText || el.textContent) === "available gpus") || controls[0];
 
     controls.forEach(el => {
       if (el !== keep) hide(el);
@@ -841,9 +833,6 @@
 
     show(keep);
     keep.textContent = "GPU overview";
-    keep.setAttribute("data-question", "GPU overview fetch live GPU status from dashboard");
-    keep.setAttribute("data-q", "GPU overview fetch live GPU status from dashboard");
-    keep.setAttribute("data-prompt", "GPU overview fetch live GPU status from dashboard");
     keep.onclick = function (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -851,13 +840,12 @@
     };
   }
 
-  function cleanRoleSidebar() {
+  function cleanRoleButtons() {
     document.querySelectorAll("button, a, [role='button'], div, li, span, p").forEach(el => {
-      if (el.id && el.id.startsWith("final-clean-")) return;
-
+      if (el.id && el.id.startsWith("lab-clean")) return;
       const t = norm(el.innerText || el.textContent);
 
-      const isOldRole =
+      if (
         t === "people and roles" ||
         t === "ta assignments" ||
         t === "manik ra count" ||
@@ -866,73 +854,78 @@
         t === "ta/ra overview" ||
         t.includes("manik ra count") ||
         t.includes("zabirul ra count") ||
-        t.includes("ta assignments");
-
-      if (isOldRole) hide(el);
+        t.includes("ta assignments")
+      ) {
+        hide(el);
+      }
     });
 
-    const sidebar = getSidebar();
-    if (!sidebar) return;
+    const sb = sidebar();
+    if (!sb) return;
 
-    let existing = document.getElementById("final-clean-roles-section");
-    if (!existing) {
-      existing = document.createElement("div");
-      existing.id = "final-clean-roles-section";
+    let block = document.getElementById("lab-clean-role-block");
+    if (!block) {
+      block = document.createElement("div");
+      block.id = "lab-clean-role-block";
 
       const title = document.createElement("div");
-      title.id = "final-clean-roles-title";
-      title.className = "final-clean-sidebar-title";
+      title.className = "lab-clean-title";
       title.textContent = "People and Roles";
 
       const btn = document.createElement("button");
-      btn.id = "final-clean-roles-button";
-      btn.className = "final-clean-sidebar-btn";
+      btn.className = "lab-clean-btn";
       btn.textContent = "TA/RA roles";
       btn.onclick = function () {
         ask("tell me about TA/RA roles");
       };
 
-      existing.appendChild(title);
-      existing.appendChild(btn);
-      sidebar.appendChild(existing);
+      block.appendChild(title);
+      block.appendChild(btn);
+      sb.appendChild(block);
     }
 
-    show(existing);
+    show(block);
   }
 
-  function addReferenceLinks() {
-    const headers = Array.from(document.querySelectorAll("*"))
-      .filter(el => norm(el.innerText || el.textContent) === "reference pages");
-
-    if (!headers.length) return;
+  function referenceBox() {
+    const headers = Array.from(document.querySelectorAll("*")).filter(el => norm(el.innerText || el.textContent) === "reference pages");
+    if (!headers.length) return null;
 
     let box = headers[0].parentElement;
-    for (let i = 0; box && i < 5; i++) {
+    for (let i = 0; box && i < 6; i++) {
       const t = norm(box.innerText || box.textContent);
-      if (t.includes("wang-axis lab website") || t.includes("reference pages")) break;
+      if (t.includes("reference pages") && t.includes("wang-axis lab website")) return box;
       box = box.parentElement;
     }
+    return headers[0].parentElement;
+  }
+
+  function forceReferenceLinks() {
+    const box = referenceBox();
     if (!box) return;
 
+    // Correct old GPU link.
     Array.from(box.querySelectorAll("a")).forEach(a => {
-      const label = norm(a.textContent || "");
-      if (label.includes("gpu scheduler")) {
+      if (norm(a.textContent).includes("gpu scheduler")) {
         a.textContent = "GPU Dashboard";
         a.href = "https://mwnafee.github.io/lab-gpu-dashboard/";
       }
     });
 
-    let container = document.getElementById("final-clean-reference-links");
+    let container = document.getElementById("lab-clean-reference-links");
     if (!container) {
       container = document.createElement("div");
-      container.id = "final-clean-reference-links";
+      container.id = "lab-clean-reference-links";
       box.appendChild(container);
     }
 
     const existing = new Set(Array.from(box.querySelectorAll("a")).map(a => a.href.replace(/\/$/, "")));
 
-    LINKS.forEach(([label, url]) => {
+    LINKS.forEach(function(pair) {
+      const label = pair[0];
+      const url = pair[1];
       const key = url.replace(/\/$/, "");
+
       if (existing.has(key)) return;
 
       const a = document.createElement("a");
@@ -947,12 +940,21 @@
     });
   }
 
+  function removeEmptySourceBlocks() {
+    document.querySelectorAll("div, p, span").forEach(el => {
+      if (el.id && el.id.startsWith("lab-clean")) return;
+      const t = norm(el.innerText || el.textContent);
+      if (t === "source links:" || t === "source links") {
+        hide(el);
+      }
+      if (/^source links:\s*$/.test(t)) hide(el);
+    });
+  }
+
   function removeTopicLines() {
     document.querySelectorAll("*").forEach(el => {
       const t = norm(el.innerText || el.textContent);
-      if (/^topic:\s*(gpu|github|inventory|datasets|overview|roles)$/.test(t)) {
-        hide(el);
-      }
+      if (/^topic:\s*(gpu|github|inventory|datasets|overview|roles)$/.test(t)) hide(el);
     });
   }
 
@@ -972,104 +974,17 @@
         const trail = url.slice(clean.length);
         return '<a href="' + clean + '" target="_blank" rel="noopener noreferrer">' + clean + '</a>' + trail;
       });
-
       node.parentNode.replaceChild(span, node);
     });
   }
 
-  function inferSourceLinks(text) {
-    const t = norm(text);
-    const out = [];
-
-    if (t.includes("gpu dashboard") || t.includes("gpu ") || t.includes("h100") || t.includes("vram")) {
-      out.push(["GPU Dashboard", "https://mwnafee.github.io/lab-gpu-dashboard/"]);
-    }
-    if (t.includes("ta/ra") || t.includes("ra term") || t.includes("ta term") || t.includes("role summary")) {
-      out.push(["TA/RA Roles Dashboard", "https://mwnafee.github.io/wanglab_phd_roles/"]);
-    }
-    if (t.includes("dataset") || t.includes("ct-rate") || t.includes("radgenome") || t.includes("merlin")) {
-      out.push(["Lab Datasets Page", "https://wang-axis.github.io/datasets/"]);
-    }
-    if (t.includes("github") || t.includes("repository") || t.includes("repositories")) {
-      out.push(["WANG-AXIS GitHub", "https://github.com/WANG-AXIS"]);
-    }
-    if (t.includes("inventory") || t.includes("asset") || t.includes("equipment") || t.includes("room")) {
-      out.push(["WANG-AXIS Lab Website", "https://wang-axis.github.io/"]);
-    }
-
-    const seen = new Set();
-    return out.filter(x => {
-      if (seen.has(x[1])) return false;
-      seen.add(x[1]);
-      return true;
-    });
-  }
-
-  function addSourceLinksAfterAnswers() {
-    const candidates = Array.from(document.querySelectorAll("div, article, section, p"))
-      .filter(el => {
-        if (el.dataset.sourceLinksDone === "1") return false;
-        if (el.closest("#final-clean-reference-links")) return false;
-        const text = el.innerText || "";
-        if (text.length < 40) return false;
-        if (text.includes("Ask the AI Lab Manager")) return false;
-        return (
-          text.includes("TA/RA role summary") ||
-          text.includes("Lab GPU Dashboard") ||
-          text.includes("GPU dashboard link") ||
-          text.includes("The lab dataset dashboard") ||
-          text.includes("The WANG-AXIS GitHub organization") ||
-          text.includes("The internal inventory contains") ||
-          text.includes("For radiology or CT vision-language work")
-        );
-      });
-
-    candidates.forEach(el => {
-      const links = inferSourceLinks(el.innerText || "");
-      if (!links.length) return;
-
-      el.dataset.sourceLinksDone = "1";
-
-      const footer = document.createElement("div");
-      footer.className = "final-source-links";
-      footer.innerHTML = "<strong>Source links:</strong> ";
-
-      links.forEach(([label, url], idx) => {
-        const a = document.createElement("a");
-        a.href = url;
-        a.target = "_blank";
-        a.rel = "noopener noreferrer";
-        a.textContent = label;
-        footer.appendChild(a);
-        if (idx < links.length - 1) {
-          footer.appendChild(document.createTextNode(" | "));
-        }
-      });
-
-      el.appendChild(footer);
-    });
-  }
-
-  function fixGreeting() {
-    document.querySelectorAll("p, div, span").forEach(el => {
-      const txt = el.innerText || "";
-      if (txt.includes("Ask me about lab inventory, datasets, GPUs, GitHub repositories, .")) {
-        el.innerText = txt.replace(
-          "Ask me about lab inventory, datasets, GPUs, GitHub repositories, .",
-          "Ask me about lab inventory, datasets, GPUs, GitHub repositories, and TA/RA roles."
-        );
-      }
-    });
-  }
-
   function run() {
-    cleanGpuSidebar();
-    cleanRoleSidebar();
-    addReferenceLinks();
+    cleanGpuButtons();
+    cleanRoleButtons();
+    forceReferenceLinks();
+    removeEmptySourceBlocks();
     removeTopicLines();
-    fixGreeting();
     linkify(document.body);
-    addSourceLinksAfterAnswers();
   }
 
   run();
@@ -1099,3 +1014,5 @@
 <!-- final-clean-ui-v5: 2026-05-25T13:10:20.320050+00:00 -->
 
 <!-- final-clean-ui-v6: 2026-05-25T13:16:17.691406+00:00 -->
+
+<!-- lab-chatbot-clean-ui-v7: 2026-05-25T13:20:17.406396+00:00 -->
